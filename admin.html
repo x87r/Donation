@@ -4,35 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel - Helper Hands</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyCP-uKQ7rZqNvT1CnW5QiWnkzclHGix_5Q",
+            authDomain: "vasudevdonations.firebaseapp.com",
+            projectId: "vasudevdonations",
+            storageBucket: "vasudevdonations.firebasestorage.app",
+            messagingSenderId: "219370651633",
+            appId: "1:219370651633:web:98146244613a1e50f90e50"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        window.db = getFirestore(app);
+    </script>
+    
     <style>
-        .admin-container {
-            min-height: 100vh;
+        /* Add the styles from admin.js or link to style.css */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
             padding: 20px;
         }
         
-        .admin-login {
+        .login-box, .admin-panel {
             background: white;
-            padding: 40px;
             border-radius: 15px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            width: 100%;
+            padding: 40px;
+        }
+        
+        .login-box {
             max-width: 400px;
+            margin: 100px auto;
         }
         
         .admin-panel {
-            background: white;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 1200px;
             display: none;
+            margin-top: 20px;
         }
         
         .admin-header {
@@ -56,6 +77,11 @@
             padding: 20px;
             border-radius: 10px;
             text-align: center;
+            transition: transform 0.3s;
+        }
+        
+        .stat-box:hover {
+            transform: translateY(-5px);
         }
         
         .stat-box h3 {
@@ -64,100 +90,143 @@
             margin-bottom: 10px;
         }
         
-        .donations-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
+        .controls {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
         }
         
-        .donations-table th,
-        .donations-table td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
+        input, select, button {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
         }
         
-        .donations-table th {
+        button {
             background: #667eea;
             color: white;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
         }
         
-        .donations-table tr:hover {
-            background: #f5f5f5;
+        button:hover {
+            background: #5a67d8;
         }
         
         .logout-btn {
             background: #e74c3c;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
+        }
+        
+        .logout-btn:hover {
+            background: #c0392b;
         }
         
         .export-btn {
             background: #27ae60;
+        }
+        
+        .export-btn:hover {
+            background: #219653;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background: #667eea;
             color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-right: 10px;
+            font-weight: 600;
         }
         
-        .filter-controls {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
+        tr:hover {
+            background: #f8f9fa;
         }
         
-        .filter-controls select,
-        .filter-controls input {
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .login-box, .admin-panel {
+                padding: 20px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            table {
+                display: block;
+                overflow-x: auto;
+            }
         }
     </style>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="admin-container">
+    <div class="container">
         <!-- Login Form -->
-        <div class="admin-login" id="loginForm">
+        <div class="login-box" id="loginForm">
             <h2 style="text-align: center; margin-bottom: 30px; color: #333;">
                 <i class="fas fa-lock"></i> Admin Login
             </h2>
             <form id="adminLoginForm">
-                <div class="form-group">
-                    <label for="adminEmail">Email</label>
+                <div style="margin-bottom: 20px;">
+                    <label for="adminEmail" style="display: block; margin-bottom: 8px; font-weight: 500;">Email</label>
                     <input type="email" id="adminEmail" required 
-                           placeholder="Enter admin email">
+                           placeholder="Enter admin email" 
+                           value="radheyjii@outlook.in"
+                           style="width: 100%;">
                 </div>
                 
-                <div class="form-group">
-                    <label for="adminPassword">Password</label>
+                <div style="margin-bottom: 20px;">
+                    <label for="adminPassword" style="display: block; margin-bottom: 8px; font-weight: 500;">Password</label>
                     <input type="password" id="adminPassword" required 
-                           placeholder="Enter password">
+                           placeholder="Enter password" 
+                           value="Sunradhey#123"
+                           style="width: 100%;">
                 </div>
                 
-                <button type="submit" class="submit-btn" style="margin-top: 20px;">
+                <button type="submit" style="width: 100%; padding: 15px; margin-top: 10px;">
                     <i class="fas fa-sign-in-alt"></i> Login
                 </button>
                 
                 <div style="text-align: center; margin-top: 20px; color: #666;">
-                    <i class="fas fa-info-circle"></i> Contact Radhey for access
+                    <i class="fas fa-info-circle"></i> Contact Radhey for support: +91 7304937349
                 </div>
             </form>
         </div>
         
-        <!-- Admin Panel (hidden until login) -->
+        <!-- Admin Panel -->
         <div class="admin-panel" id="adminPanel">
             <div class="admin-header">
                 <div>
                     <h2><i class="fas fa-cog"></i> Helper Hands Admin Panel</h2>
-                    <p style="color: #666;">Welcome, Admin</p>
+                    <p style="color: #666;">Welcome, Admin | <span id="currentTime"></span></p>
                 </div>
-                <button class="logout-btn" onclick="logout()">
+                <button class="logout-btn" id="logoutBtn">
                     <i class="fas fa-sign-out-alt"></i> Logout
                 </button>
             </div>
@@ -181,61 +250,115 @@
                     <p>Dog Meals</p>
                 </div>
                 <div class="stat-box">
+                    <h3 id="bothDonations">0</h3>
+                    <p>Both</p>
+                </div>
+                <div class="stat-box">
                     <h3 id="ownerDonations">0</h3>
                     <p>Owner Support</p>
+                </div>
+                <div class="stat-box">
+                    <h3 id="verifiedDonations">0</h3>
+                    <p>Verified</p>
+                </div>
+                <div class="stat-box">
+                    <h3 id="pendingDonations">0</h3>
+                    <p>Pending</p>
+                </div>
+                <div class="stat-box">
+                    <h3 id="todayDonations">0</h3>
+                    <p>Today</p>
                 </div>
             </div>
             
             <!-- Controls -->
-            <div class="filter-controls">
-                <button class="export-btn" onclick="exportData()">
-                    <i class="fas fa-download"></i> Export to CSV
+            <div class="controls">
+                <button class="export-btn" id="exportBtn">
+                    <i class="fas fa-download"></i> Export CSV
                 </button>
                 
-                <select id="filterType" onchange="filterDonations()">
-                    <option value="all">All Donations</option>
-                    <option value="child">Child Meals Only</option>
-                    <option value="dog">Dog Meals Only</option>
+                <input type="text" id="searchInput" placeholder="Search by name, email, phone..." 
+                       style="flex: 1;">
+                
+                <select id="filterType">
+                    <option value="all">All Types</option>
+                    <option value="child">Child Only</option>
+                    <option value="dog">Dog Only</option>
                     <option value="both">Both</option>
                     <option value="owner">Owner Support</option>
                 </select>
                 
-                <input type="date" id="filterDate" onchange="filterDonations()">
-                
-                <input type="text" id="searchInput" placeholder="Search by name or email..." 
-                       onkeyup="filterDonations()">
+                <input type="date" id="filterDate">
             </div>
             
             <!-- Donations Table -->
             <div style="overflow-x: auto;">
-                <table class="donations-table">
+                <table>
                     <thead>
                         <tr>
-                            <th>Date</th>
-                            <th>Name</th>
+                            <th>Date & Time</th>
+                            <th>Donor Name</th>
                             <th>Email</th>
                             <th>Phone</th>
                             <th>Type</th>
-                            <th>Amount (₹)</th>
+                            <th>Amount</th>
                             <th>Instagram</th>
-                            <th>WhatsApp</th>
                             <th>Status</th>
+                            <th>Source</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="donationsTable">
-                        <!-- Data will be populated by JavaScript -->
+                        <!-- Data will be loaded here -->
                     </tbody>
                 </table>
             </div>
             
-            <div style="text-align: center; margin-top: 30px; color: #666;">
-                <p><i class="fas fa-sync-alt"></i> Data updates in real-time</p>
-                <p><i class="fas fa-phone"></i> Contact: +91 7304937349 | radheyjii@outlook.in</p>
+            <div style="text-align: center; margin-top: 30px; color: #666; padding: 20px;">
+                <p><i class="fas fa-sync-alt"></i> Auto-refreshes every 30 seconds</p>
+                <p><i class="fas fa-phone"></i> Support: +91 7304937349 | radheyjii@outlook.in</p>
+                <p style="margin-top: 10px; font-size: 0.9rem;">
+                    <i class="fas fa-info-circle"></i> 
+                    <span id="lastUpdated">Last updated: Never</span>
+                </p>
             </div>
         </div>
     </div>
     
-    <script src="admin.js"></script>
+    <!-- Main Admin JavaScript -->
+    <script type="module" src="admin.js"></script>
+    
+    <script>
+        // Update current time
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-IN', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            const dateString = now.toLocaleDateString('en-IN', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            const timeElement = document.getElementById('currentTime');
+            if (timeElement) {
+                timeElement.textContent = `${dateString} | ${timeString}`;
+            }
+            
+            // Update last updated time
+            const lastUpdated = document.getElementById('lastUpdated');
+            if (lastUpdated) {
+                lastUpdated.textContent = `Last updated: ${timeString}`;
+            }
+        }
+        
+        // Update time every second
+        setInterval(updateTime, 1000);
+        updateTime(); // Initial call
+    </script>
 </body>
 </html>
