@@ -764,14 +764,11 @@
                 </div>
                 
                 <div style="margin-bottom: 30px; display: flex; gap: 15px; flex-wrap: wrap;">
-                    <button onclick="exportToCSV()" class="cta-button" style="padding: 10px 20px; font-size: 14px;">
-                        <i class="fas fa-download"></i> Export to Excel
+                    <button onclick="viewGoogleFormResponses()" class="cta-button" style="padding: 10px 20px; font-size: 14px; background: #10b981;">
+                        <i class="fas fa-external-link-alt"></i> View Google Form Responses
                     </button>
-                    <button onclick="printRecords()" class="cta-button" style="padding: 10px 20px; font-size: 14px;">
-                        <i class="fas fa-print"></i> Print Records
-                    </button>
-                    <button onclick="clearAllData()" class="cta-button" style="padding: 10px 20px; font-size: 14px; background-color: #dc2626;">
-                        <i class="fas fa-trash"></i> Clear All Data
+                    <button onclick="addManualDonation()" class="cta-button" style="padding: 10px 20px; font-size: 14px; background: #f59e0b;">
+                        <i class="fas fa-plus"></i> Add Manual Donation
                     </button>
                 </div>
                 
@@ -855,33 +852,38 @@
                 <button class="close-modal" id="close-modal">&times;</button>
             </div>
             <div class="modal-body">
-                <form id="donation-form">
+                <!-- GOOGLE FORM INTEGRATION -->
+                <form id="donation-form" action="https://docs.google.com/forms/d/e/1FAIpQLSdQ_-2nptHe-L2C1YQZ6pbnqB9QF4bNKYJtHe3uT5EB5J8PQA/formResponse" method="POST" target="_blank">
+                    <!-- Hidden fields for Google Form -->
+                    <input type="hidden" name="entry.693946004" id="form-type" value="">
+                    <input type="hidden" name="entry.178830807" id="form-amount" value="">
+                    
                     <div class="form-group">
                         <label for="donor-name" class="required">Full Name</label>
-                        <input type="text" id="donor-name" required>
+                        <input type="text" id="donor-name" name="entry.1308563865" required>
                     </div>
                     
                     <div class="form-group">
                         <label for="donor-email" class="required">Email Address</label>
-                        <input type="email" id="donor-email" required>
+                        <input type="email" id="donor-email" name="entry.520356677" required>
                         <small style="color: var(--gray);">You'll receive donation confirmation and photos here</small>
                     </div>
                     
                     <div class="form-group">
                         <label for="donor-phone">Phone Number (Optional)</label>
-                        <input type="tel" id="donor-phone">
+                        <input type="tel" id="donor-phone" name="entry.2044815525">
                         <small style="color: var(--gray);">For WhatsApp confirmation</small>
                     </div>
                     
                     <div class="form-group">
                         <label for="donor-instagram">Instagram Username (Optional)</label>
-                        <input type="text" id="donor-instagram">
+                        <input type="text" id="donor-instagram" name="entry.2130990704">
                         <small style="color: var(--gray);">We'll mention you in our updates</small>
                     </div>
                     
                     <div class="form-group">
                         <label for="donation-type">Donation Type</label>
-                        <select id="donation-type">
+                        <select id="donation-type" onchange="updateDonationType(this.value)">
                             <option value="child">Child Meal - ₹30</option>
                             <option value="dog">Dog Meal - ₹20</option>
                             <option value="both">Both Child & Dog - ₹50</option>
@@ -890,12 +892,12 @@
                     
                     <div class="form-group">
                         <label for="donation-amount">Amount (₹) *</label>
-                        <input type="number" id="donation-amount" required min="1">
+                        <input type="number" id="donation-amount" required min="1" onchange="updateDonationAmount(this.value)">
                     </div>
                     
                     <div class="form-group">
                         <label for="donor-message">Message (Optional)</label>
-                        <textarea id="donor-message" rows="3" placeholder="Any message or instructions for us..."></textarea>
+                        <textarea id="donor-message" name="entry.1105405498" rows="3" placeholder="Any message or instructions for us..."></textarea>
                     </div>
                     
                     <div class="payment-info">
@@ -939,25 +941,29 @@
                     <p>Any amount is appreciated to help us continue our mission</p>
                 </div>
                 
-                <form id="owner-donation-form">
+                <!-- GOOGLE FORM INTEGRATION -->
+                <form id="owner-donation-form" action="https://docs.google.com/forms/d/e/1FAIpQLSdQ_-2nptHe-L2C1YQZ6pbnqB9QF4bNKYJtHe3uT5EB5J8PQA/formResponse" method="POST" target="_blank">
+                    <!-- Hidden fields for Google Form -->
+                    <input type="hidden" name="entry.693946004" value="owner_support">
+                    
                     <div class="form-group">
                         <label for="owner-name" class="required">Your Name</label>
-                        <input type="text" id="owner-name" required>
+                        <input type="text" id="owner-name" name="entry.1308563865" required>
                     </div>
                     
                     <div class="form-group">
                         <label for="owner-email" class="required">Your Email</label>
-                        <input type="email" id="owner-email" required>
+                        <input type="email" id="owner-email" name="entry.520356677" required>
                     </div>
                     
                     <div class="form-group">
                         <label for="owner-phone">Phone Number (Optional)</label>
-                        <input type="tel" id="owner-phone">
+                        <input type="tel" id="owner-phone" name="entry.2044815525">
                     </div>
                     
                     <div class="form-group">
                         <label for="owner-amount" class="required">Amount (₹)</label>
-                        <input type="number" id="owner-amount" required min="1" value="100">
+                        <input type="number" id="owner-amount" name="entry.178830807" required min="1" value="100">
                     </div>
                     
                     <div class="payment-info">
@@ -993,11 +999,20 @@
                     <p>We have saved your donation details and will contact you on WhatsApp within 24 hours.</p>
                     <p>You will receive photos of the meals provided within 6-7 days.</p>
                     <div style="margin: 30px 0; padding: 20px; background: #f0f9ff; border-radius: 10px;">
-                        <p><strong>Receipt ID:</strong> <span id="receipt-id"></span></p>
-                        <p><strong>Amount:</strong> ₹<span id="donation-amount-display"></span></p>
-                        <p><strong>Type:</strong> <span id="donation-type-display"></span></p>
+                        <p><strong>Important:</strong> Please keep this Receipt ID for reference:</p>
+                        <p style="font-size: 18px; font-weight: bold; color: var(--primary);" id="receipt-id"></p>
                     </div>
-                    <p>For any questions, contact us at +91 7304937349</p>
+                    <p><strong>Next Steps:</strong></p>
+                    <ol style="text-align: left; margin: 15px 0; padding-left: 20px;">
+                        <li>We'll WhatsApp you within 24 hours</li>
+                        <li>Send payment screenshot on WhatsApp: +91 7304937349</li>
+                        <li>Photos will be sent within 6-7 days</li>
+                    </ol>
+                    <div style="margin: 20px 0; padding: 15px; background: #fef3c7; border-radius: 5px;">
+                        <a href="https://wa.me/917304937349" target="_blank" style="display: block; background: #25D366; color: white; padding: 12px; border-radius: 5px; text-decoration: none; font-weight: bold;">
+                            <i class="fab fa-whatsapp"></i> Click Here to WhatsApp Us Now
+                        </a>
+                    </div>
                     <button onclick="closeThankYouModal()" class="cta-button" style="margin-top: 20px;">Close</button>
                 </div>
             </div>
@@ -1038,22 +1053,22 @@
                         id: 1,
                         date: new Date().toLocaleString(),
                         name: 'Rahul Sharma',
-                        email: 'rahulsharma2006@gmail.com',
-                        phone: '',
+                        email: 'rahul@example.com',
+                        phone: '9876543210',
                         type: 'child',
                         amount: 30,
-                        instagram: '@rahul.k800',
+                        instagram: '@rahul_sharma',
                         status: 'Pending WhatsApp'
                     },
                     {
                         id: 2,
                         date: new Date(Date.now() - 86400000).toLocaleString(),
-                        name: 'Priya',
-                        email: 'vikasmahajan02@gmail.com',
+                        name: 'Priya Patel',
+                        email: 'priya@example.com',
                         phone: '',
                         type: 'dog',
                         amount: 20,
-                        instagram: '@priya_sharma_10_2',
+                        instagram: '',
                         status: 'Photos Sent'
                     }
                 ];
@@ -1083,7 +1098,7 @@
             const qrImages = {
                 'child': 'qr-child.png',
                 'dog': 'qr-dog.png',
-                'both': 'qr-child.png' // You can add separate QR for both if needed
+                'both': 'qr-child.png'
             };
             document.getElementById('qr-image').src = qrImages[type];
             
@@ -1093,6 +1108,10 @@
             // Set donation type and amount
             document.getElementById('donation-type').value = type;
             document.getElementById('donation-amount').value = amount;
+            
+            // Set Google Form hidden fields
+            document.getElementById('form-type').value = type;
+            document.getElementById('form-amount').value = amount;
             
             // Reset form and show modal
             donationForm.reset();
@@ -1157,13 +1176,40 @@
                 `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         }
 
-        // ==================== SAVE DONATION ====================
+        // ==================== GOOGLE FORM FUNCTIONS ====================
+        function updateDonationType(type) {
+            document.getElementById('form-type').value = type;
+            
+            // Update amount based on type
+            const amounts = {
+                'child': 30,
+                'dog': 20,
+                'both': 50
+            };
+            
+            if (amounts[type]) {
+                document.getElementById('donation-amount').value = amounts[type];
+                document.getElementById('form-amount').value = amounts[type];
+            }
+        }
+
+        function updateDonationAmount(amount) {
+            document.getElementById('form-amount').value = amount;
+        }
+
+        // ==================== FORM SUBMISSION ====================
         donationForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // Get form values
+            // Generate receipt ID
+            const receiptId = 'HH' + Date.now().toString().slice(-8);
+            
+            // Show thank you modal with receipt ID
+            document.getElementById('receipt-id').textContent = receiptId;
+            
+            // Save to localStorage for admin reference
             const donationData = {
-                id: Date.now(),
+                id: receiptId,
                 date: new Date().toLocaleString(),
                 name: document.getElementById('donor-name').value,
                 email: document.getElementById('donor-email').value,
@@ -1172,16 +1218,18 @@
                 amount: parseFloat(document.getElementById('donation-amount').value),
                 instagram: document.getElementById('donor-instagram').value || '',
                 message: document.getElementById('donor-message').value || '',
-                status: 'Pending WhatsApp Contact'
+                status: 'Submitted via Google Form'
             };
             
-            // Save to localStorage
-            saveDonation(donationData);
+            saveToLocalStorage(donationData);
+            
+            // Submit to Google Form (will open in new tab)
+            this.submit();
             
             // Show thank you modal
-            showThankYouModal(donationData);
+            thankyouModal.style.display = 'flex';
             
-            // Reset and close modal
+            // Reset and close donation modal
             donationForm.reset();
             closeModal();
         });
@@ -1189,8 +1237,11 @@
         ownerDonationForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
+            const receiptId = 'HH' + Date.now().toString().slice(-8);
+            document.getElementById('receipt-id').textContent = receiptId;
+            
             const donationData = {
-                id: Date.now(),
+                id: receiptId,
                 date: new Date().toLocaleString(),
                 name: document.getElementById('owner-name').value,
                 email: document.getElementById('owner-email').value,
@@ -1199,46 +1250,30 @@
                 amount: parseFloat(document.getElementById('owner-amount').value),
                 instagram: '',
                 message: 'Owner Support Donation',
-                status: 'Pending - UPI Payment'
+                status: 'Submitted via Google Form'
             };
             
-            saveDonation(donationData);
-            showThankYouModal(donationData);
+            saveToLocalStorage(donationData);
+            
+            // Submit to Google Form
+            this.submit();
+            
+            thankyouModal.style.display = 'flex';
             ownerDonationForm.reset();
             closeOwnerModal();
         });
 
-        function saveDonation(donation) {
-            // Get existing donations or initialize empty array
+        function saveToLocalStorage(donation) {
             let donations = JSON.parse(localStorage.getItem('helperHandsDonations')) || [];
-            
-            // Add new donation
             donations.push(donation);
-            
-            // Save back to localStorage
             localStorage.setItem('helperHandsDonations', JSON.stringify(donations));
             
-            console.log('Donation saved:', donation);
+            console.log('Donation saved locally:', donation);
             
             // Update admin panel if visible
             if (document.getElementById('admin-panel').style.display !== 'none') {
                 loadDonationsTable();
             }
-        }
-
-        function showThankYouModal(donation) {
-            document.getElementById('receipt-id').textContent = donation.id;
-            document.getElementById('donation-amount-display').textContent = donation.amount;
-            
-            const typeText = {
-                'child': 'Child Meal',
-                'dog': 'Dog Meal',
-                'both': 'Both Child & Dog',
-                'owner': 'Owner Support'
-            };
-            document.getElementById('donation-type-display').textContent = typeText[donation.type] || donation.type;
-            
-            thankyouModal.style.display = 'flex';
         }
 
         // ==================== ADMIN FUNCTIONS ====================
@@ -1327,113 +1362,43 @@
             });
         }
 
-        function exportToCSV() {
-            const donations = JSON.parse(localStorage.getItem('helperHandsDonations')) || [];
-            
-            if (donations.length === 0) {
-                alert('No data to export');
-                return;
-            }
-            
-            // Convert to CSV
-            const headers = ['Date', 'Name', 'Email', 'Phone', 'Type', 'Amount', 'Instagram', 'Status'];
-            const csvRows = [
-                headers.join(','),
-                ...donations.map(d => [
-                    `"${d.date}"`,
-                    `"${d.name}"`,
-                    `"${d.email}"`,
-                    `"${d.phone || ''}"`,
-                    `"${d.type}"`,
-                    d.amount,
-                    `"${d.instagram || ''}"`,
-                    `"${d.status}"`
-                ].join(','))
-            ];
-            
-            const csvString = csvRows.join('\n');
-            const blob = new Blob([csvString], { type: 'text/csv' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `helper-hands-donations-${new Date().toISOString().split('T')[0]}.csv`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            alert(`Exported ${donations.length} donations to CSV`);
+        // ==================== SPECIAL ADMIN FUNCTIONS ====================
+        function viewGoogleFormResponses() {
+            window.open('https://docs.google.com/spreadsheets/d/1svyPqYnpKgqRq1TLng9N0l6J90yH-7w7UNb5hz12DnQ/edit?usp=sharing', '_blank');
         }
 
-        function printRecords() {
-            const printWindow = window.open('', '_blank');
-            const donations = JSON.parse(localStorage.getItem('helperHandsDonations')) || [];
+        function addManualDonation() {
+            const name = prompt("Donor Name:");
+            if (!name) return;
             
-            let html = `
-                <html>
-                <head>
-                    <title>Helper Hands Donation Records</title>
-                    <style>
-                        body { font-family: Arial, sans-serif; margin: 20px; }
-                        h1 { color: #1e3a8a; }
-                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-                        th { background-color: #1e3a8a; color: white; }
-                        tr:nth-child(even) { background-color: #f2f2f2; }
-                    </style>
-                </head>
-                <body>
-                    <h1>Helper Hands Donation Records</h1>
-                    <p>Generated on: ${new Date().toLocaleString()}</p>
-                    <p>Total Donations: ${donations.length}</p>
-                    <table>
-                        <tr>
-                            <th>Date</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Phone</th>
-                            <th>Type</th>
-                            <th>Amount</th>
-                            <th>Instagram</th>
-                            <th>Status</th>
-                        </tr>
-            `;
+            const email = prompt("Donor Email:");
+            if (!email) return;
             
-            donations.forEach(d => {
-                html += `
-                    <tr>
-                        <td>${d.date}</td>
-                        <td>${d.name}</td>
-                        <td>${d.email}</td>
-                        <td>${d.phone || '-'}</td>
-                        <td>${d.type}</td>
-                        <td>₹${d.amount}</td>
-                        <td>${d.instagram || '-'}</td>
-                        <td>${d.status}</td>
-                    </tr>
-                `;
-            });
+            const phone = prompt("Donor Phone (optional):");
             
-            html += `
-                    </table>
-                    <p style="margin-top: 30px; font-style: italic;">
-                        Helper Hands - "WE FOR YOU" | Contact: +91 7304937349
-                    </p>
-                </body>
-                </html>
-            `;
+            const type = prompt("Type (child/dog/both/owner):");
+            if (!type) return;
             
-            printWindow.document.write(html);
-            printWindow.document.close();
-            printWindow.print();
-        }
-
-        function clearAllData() {
-            if (confirm('⚠️ Are you sure you want to delete ALL donation records? This cannot be undone!')) {
-                localStorage.removeItem('helperHandsDonations');
-                loadDonationsTable();
-                alert('All data has been cleared.');
-            }
+            const amount = prompt("Amount (₹):");
+            if (!amount) return;
+            
+            const instagram = prompt("Instagram (optional):");
+            
+            const donation = {
+                id: 'MANUAL_' + Date.now(),
+                date: new Date().toLocaleString(),
+                name: name,
+                email: email,
+                phone: phone || '',
+                type: type,
+                amount: parseFloat(amount),
+                instagram: instagram || '',
+                status: 'Added Manually'
+            };
+            
+            saveToLocalStorage(donation);
+            alert('✅ Donation added successfully!');
+            loadDonationsTable();
         }
 
         // ==================== SMOOTH SCROLLING ====================
