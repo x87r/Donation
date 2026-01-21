@@ -4,7 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Helper Hands - Donate Meals to Children & Dogs</title>
-    <script type="module" src="script.js"></script>
+    
+    <!-- ===== FIREBASE SDK ===== -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyCP-uKQ7rZqNvT1CnW5QiWnkzclHGix_5Q",
+            authDomain: "vasudevdonations.firebaseapp.com",
+            projectId: "vasudevdonations",
+            storageBucket: "vasudevdonations.firebasestorage.app",
+            messagingSenderId: "219370651633",
+            appId: "1:219370651633:web:98146244613a1e50f90e50"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        window.db = getFirestore(app);
+    </script>
+    <!-- ===== END FIREBASE ===== -->
+    
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -169,7 +188,7 @@
             </div>
 
             <form id="donationForm">
-                <input type="hidden" id="donationType" name="donationType">
+                <input type="hidden" id="donationType" name="donationType" value="child">
                 
                 <div class="form-group">
                     <label for="name">Full Name *</label>
@@ -266,7 +285,7 @@
                         <div>
                             <h3>Email</h3>
                             <p>radheyjii@outlook.in</p>
-                            <p>wasdimu@gmail.com</p>
+                            <p>helperhands7244@gmail.com</p>
                         </div>
                     </div>
                     <div class="contact-item">
@@ -340,6 +359,39 @@
         </div>
     </footer>
 
+    <!-- Main JavaScript -->
     <script src="script.js"></script>
+    
+    <!-- Firebase Functions -->
+    <script>
+        // Global functions for buttons
+        window.openDonationForm = function(type) {
+            if (window.openDonationFormGlobal) {
+                window.openDonationFormGlobal(type);
+            } else {
+                alert('Please wait, page is loading...');
+            }
+        };
+        
+        window.openOwnerDonation = function() {
+            if (window.openOwnerDonationGlobal) {
+                window.openOwnerDonationGlobal();
+            } else {
+                alert('UPI ID: 9797590308@fam\n\nPlease send payment to this UPI ID.\nThen WhatsApp us: +91 7304937349');
+            }
+        };
+        
+        window.closeModal = function() {
+            if (window.closeModalGlobal) {
+                window.closeModalGlobal();
+            }
+        };
+        
+        window.closeOwnerModal = function() {
+            if (window.closeOwnerModalGlobal) {
+                window.closeOwnerModalGlobal();
+            }
+        };
+    </script>
 </body>
 </html>
