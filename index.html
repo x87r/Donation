@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helper Hands - Donate Meals to Children & Dogs</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <img src="logo.png" alt="Helper Hands Logo" style="height: 40px; margin-right: 10px;">
+                <div>
+                    <h1>HELPER HANDS</h1>
+                    <p class="tagline">WE FOR YOU</p>
+                </div>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#donate">Donate</a></li>
+                <li><a href="#contact">Contact</a></li>
+                <li><a href="admin.html" class="admin-btn">Admin</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1><span class="radhey">#RADHEY</span></h1>
+            <h2>"Your small contribution means a lot"</h2>
+            <p class="motto">HELPING THE ONES WHO NEEDS THE MOST</p>
+            <a href="#donate" class="cta-button">Donate Now <i class="fas fa-heart"></i></a>
+        </div>
+        <div class="hero-image">
+            <div class="floating-card">
+                <i class="fas fa-child"></i>
+                <h3>Child Meal</h3>
+                <p>₹30 per meal</p>
+            </div>
+            <div class="floating-card">
+                <i class="fas fa-paw"></i>
+                <h3>Dog Meal</h3>
+                <p>₹20 per meal</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="container">
+            <h2 class="section-title">About Helper Hands</h2>
+            <div class="about-content">
+                <div class="about-text">
+                    <p>Founded by <strong>Radhey</strong>, Helper Hands is a non-profit initiative dedicated to providing meals to underprivileged children and stray dogs. Our motto "WE FOR YOU" reflects our commitment to serve those in need.</p>
+                    <p>Every donation, no matter how small, makes a significant difference. We ensure transparency by sending pictures and updates to donors within 6-7 days of their contribution.</p>
+                    <div class="stats">
+                        <div class="stat">
+                            <h3>5000+</h3>
+                            <p>Meals Provided</p>
+                        </div>
+                        <div class="stat">
+                            <h3>1000+</h3>
+                            <p>Donors</p>
+                        </div>
+                        <div class="stat">
+                            <h3>24/7</h3>
+                            <p>Support</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-image">
+                    <div class="owner-card">
+                        <h3>Website Owner</h3>
+                        <p><strong>Name:</strong> Radhey</p>
+                        <p><strong>Email:</strong> radheyjii@outlook.in</p>
+                        <p><strong>Phone:</strong> +91 7304937349</p>
+                        <p><strong>Support:</strong> 24/7 Available</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Donation Section -->
+    <section id="donate" class="donate">
+        <div class="container">
+            <h2 class="section-title">Make a Donation</h2>
+            <p class="section-subtitle">Choose where you want to make a difference</p>
+            
+            <div class="donation-options">
+                <!-- Child Donation -->
+                <div class="donation-card" id="child-card">
+                    <div class="card-header">
+                        <i class="fas fa-child"></i>
+                        <h3>Donate to Children</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="price">₹30 per meal</p>
+                        <p>Provide nutritious meals to underprivileged children</p>
+                        <button class="donate-btn" onclick="openDonationForm('child')">Donate Now</button>
+                    </div>
+                </div>
+
+                <!-- Dog Donation -->
+                <div class="donation-card" id="dog-card">
+                    <div class="card-header">
+                        <i class="fas fa-paw"></i>
+                        <h3>Donate to Dogs</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="price">₹20 per meal</p>
+                        <p>Feed stray dogs and give them a better life</p>
+                        <button class="donate-btn" onclick="openDonationForm('dog')">Donate Now</button>
+                    </div>
+                </div>
+
+                <!-- Both -->
+                <div class="donation-card" id="both-card">
+                    <div class="card-header">
+                        <i class="fas fa-hands-helping"></i>
+                        <h3>Donate to Both</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="price">₹50 for both</p>
+                        <p>Support both children and dogs simultaneously</p>
+                        <button class="donate-btn" onclick="openDonationForm('both')">Donate Now</button>
+                    </div>
+                </div>
+
+                <!-- Owner Support -->
+                <div class="donation-card" id="owner-card">
+                    <div class="card-header">
+                        <i class="fas fa-user-tie"></i>
+                        <h3>Support Owner</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="price">Any Amount</p>
+                        <p>Support our operations and maintenance</p>
+                        <button class="donate-btn" onclick="openOwnerDonation()">Donate Now</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Donation Modal -->
+    <div id="donationModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 id="modalTitle">Donate to Children</h2>
+            
+            <div id="qrContainer">
+                <h3>Scan QR Code to Pay</h3>
+                <img id="qrImage" src="qr-child.png" alt="QR Code" style="max-width: 200px; margin: 20px auto; display: block;">
+                <p class="timer">Time remaining: <span id="timer">05:00</span></p>
+                <p class="note">Please complete payment within 5 minutes</p>
+            </div>
+
+            <form id="donationForm">
+                <input type="hidden" id="donationType" name="donationType">
+                
+                <div class="form-group">
+                    <label for="name">Full Name *</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address *</label>
+                    <input type="email" id="email" name="email" required>
+                    <small>We'll send meal pictures to this email</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone Number (Optional)</label>
+                    <input type="tel" id="phone" name="phone">
+                </div>
+
+                <div class="form-group">
+                    <label for="instagram">Instagram Username (Optional)</label>
+                    <input type="text" id="instagram" name="instagram" placeholder="@username">
+                </div>
+
+                <div class="form-group">
+                    <label for="amount">Donation Amount (₹) *</label>
+                    <input type="number" id="amount" name="amount" required min="1">
+                </div>
+
+                <div class="form-group">
+                    <label for="message">Message (Optional)</label>
+                    <textarea id="message" name="message" rows="3"></textarea>
+                </div>
+
+                <div class="form-group checkbox">
+                    <input type="checkbox" id="whatsapp" name="whatsapp">
+                    <label for="whatsapp">I'd like to receive WhatsApp confirmation</label>
+                </div>
+
+                <div class="form-group checkbox">
+                    <input type="checkbox" id="terms" name="terms" required>
+                    <label for="terms">I agree to receive updates and pictures within 6-7 days</label>
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-check-circle"></i> I Have Paid
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Owner Donation Modal -->
+    <div id="ownerModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeOwnerModal()">&times;</span>
+            <h2>Support Our Operations</h2>
+            
+            <div class="upi-info">
+                <i class="fas fa-qrcode"></i>
+                <h3>UPI Payment</h3>
+                <p class="upi-id">9797590308@fam</p>
+                <p>Scan any UPI QR code app and send money to this ID</p>
+            </div>
+
+            <form id="ownerDonationForm">
+                <div class="form-group">
+                    <label for="ownerName">Your Name *</label>
+                    <input type="text" id="ownerName" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="ownerEmail">Your Email *</label>
+                    <input type="email" id="ownerEmail" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="ownerAmount">Amount (₹) *</label>
+                    <input type="number" id="ownerAmount" required min="1">
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-heart"></i> Confirm Donation
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2 class="section-title">Contact & Support</h2>
+            <div class="contact-content">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <div>
+                            <h3>Email</h3>
+                            <p>radheyjii@outlook.in</p>
+                            <p>wasdimu@gmail.com</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <div>
+                            <h3>Phone & WhatsApp</h3>
+                            <p>+91 7304937349 (24/7)</p>
+                            <small>Click to chat on WhatsApp</small>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-clock"></i>
+                        <div>
+                            <h3>Support Hours</h3>
+                            <p>24/7 Available</p>
+                            <p>Quick response guaranteed</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-shield-alt"></i>
+                        <div>
+                            <h3>Transparency</h3>
+                            <p>Pictures sent within 6-7 days</p>
+                            <p>Manual verification of all donations</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="support-box">
+                    <h3>Need Immediate Help?</h3>
+                    <p>Contact us directly on WhatsApp for instant support</p>
+                    <a href="https://wa.me/917304937349" class="whatsapp-btn" target="_blank">
+                        <i class="fab fa-whatsapp"></i> Chat on WhatsApp
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <h2>HELPER HANDS</h2>
+                    <p>"WE FOR YOU"</p>
+                    <p class="radhey-footer">#RADHEY</p>
+                </div>
+                
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <a href="#home">Home</a>
+                    <a href="#about">About</a>
+                    <a href="#donate">Donate</a>
+                    <a href="#contact">Contact</a>
+                    <a href="admin.html">Admin Login</a>
+                </div>
+                
+                <div class="footer-contact">
+                    <h3>Stay Connected</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> Serving Nationwide</p>
+                    <p><i class="fas fa-envelope"></i> radheyjii@outlook.in</p>
+                    <p><i class="fas fa-phone"></i> +91 7304937349</p>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 Helper Hands. All rights reserved. | Made with <i class="fas fa-heart"></i> by Radhey</p>
+                <p class="motto">HELPING THE ONES WHO NEEDS THE MOST</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
