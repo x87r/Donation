@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thank You - Helper Hands</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .thank-you-container {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        
+        .thank-you-card {
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .checkmark {
+            width: 100px;
+            height: 100px;
+            background: #27ae60;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 30px;
+        }
+        
+        .checkmark i {
+            font-size: 50px;
+            color: white;
+        }
+        
+        .thank-you-card h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        
+        .thank-you-card p {
+            color: #7f8c8d;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .donation-details {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 30px 0;
+            text-align: left;
+        }
+        
+        .next-steps {
+            margin-top: 30px;
+            text-align: left;
+        }
+        
+        .next-steps li {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            padding: 15px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.3s;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-3px);
+        }
+        
+        .whatsapp-btn {
+            background: #25D366;
+            color: white;
+        }
+        
+        .home-btn {
+            background: #3498db;
+            color: white;
+        }
+        
+        .donate-again-btn {
+            background: #9b59b6;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="thank-you-container">
+        <div class="thank-you-card">
+            <div class="checkmark">
+                <i class="fas fa-check"></i>
+            </div>
+            
+            <h1>Thank You for Your Generous Donation!</h1>
+            
+            <p>Your contribution is making a real difference in someone's life.</p>
+            <p><strong>#RADHEY</strong> and the entire Helper Hands team appreciate your support.</p>
+            
+            <div class="donation-details" id="donationDetails">
+                <!-- Details will be populated by JavaScript -->
+            </div>
+            
+            <div class="next-steps">
+                <h3><i class="fas fa-list-check"></i> What Happens Next:</h3>
+                <ul>
+                    <li><i class="fas fa-envelope"></i> You'll receive a confirmation email within 24 hours</li>
+                    <li><i class="fas fa-camera"></i> We'll send pictures of the meals within 6-7 days</li>
+                    <li><i class="fas fa-comment"></i> Our team will contact you on WhatsApp for verification</li>
+                    <li><i class="fas fa-shield-alt"></i> Your donation is being processed securely</li>
+                </ul>
+            </div>
+            
+            <div class="action-buttons">
+                <a href="https://wa.me/917304937349" class="action-btn whatsapp-btn" target="_blank">
+                    <i class="fab fa-whatsapp"></i> Contact on WhatsApp
+                </a>
+                
+                <a href="index.html" class="action-btn home-btn">
+                    <i class="fas fa-home"></i> Back to Home
+                </a>
+                
+                <a href="index.html#donate" class="action-btn donate-again-btn">
+                    <i class="fas fa-heart"></i> Donate Again
+                </a>
+            </div>
+            
+            <div style="margin-top: 30px; color: #95a5a6; font-size: 0.9rem;">
+                <p><i class="fas fa-phone"></i> Need immediate assistance? Call +91 7304937349</p>
+                <p><i class="fas fa-envelope"></i> Email: radheyjii@outlook.in</p>
+                <p style="margin-top: 20px; font-style: italic;">"Your small contribution means a lot"</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Get donation details from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const name = urlParams.get('name') || 'Donor';
+        const amount = urlParams.get('amount') || '0';
+        const type = urlParams.get('type') || 'donation';
+        
+        // Update donation details
+        const detailsDiv = document.getElementById('donationDetails');
+        const typeText = {
+            'child': 'Child Meal Donation',
+            'dog': 'Dog Meal Donation',
+            'both': 'Child & Dog Meal Donation',
+            'owner': 'Owner Support Donation'
+        };
+        
+        detailsDiv.innerHTML = `
+            <h3><i class="fas fa-receipt"></i> Donation Summary</h3>
+            <p><strong>Name:</strong> ${decodeURIComponent(name)}</p>
+            <p><strong>Amount:</strong> ₹${amount}</p>
+            <p><strong>Type:</strong> ${typeText[type] || 'General Donation'}</p>
+            <p><strong>Date:</strong> ${new Date().toLocaleDateString('en-IN', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            })}</p>
+            <p><strong>Transaction ID:</strong> TH${Date.now().toString().slice(-8)}</p>
+        `;
+        
+        // Store in localStorage for admin access
+        const donationRecord = {
+            id: 'TH' + Date.now().toString().slice(-8),
+            name: decodeURIComponent(name),
+            amount: parseFloat(amount),
+            type: type,
+            timestamp: new Date().toISOString(),
+            status: 'pending'
+        };
+        
+        // Save to localStorage (in production, this would go to your database)
+        let donations = JSON.parse(localStorage.getItem('helperHandsDonations') || '[]');
+        donations.push(donationRecord);
+        localStorage.setItem('helperHandsDonations', JSON.stringify(donations));
+        
+        // Auto-redirect after 30 seconds
+        setTimeout(() => {
+            window.location.href = 'index.html';
+        }, 30000);
+    </script>
+</body>
+</html>
