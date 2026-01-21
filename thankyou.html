@@ -4,96 +4,219 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thank You - Helper Hands</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyCP-uKQ7rZqNvT1CnW5QiWnkzclHGix_5Q",
+            authDomain: "vasudevdonations.firebaseapp.com",
+            projectId: "vasudevdonations",
+            storageBucket: "vasudevdonations.firebasestorage.app",
+            messagingSenderId: "219370651633",
+            appId: "1:219370651633:web:98146244613a1e50f90e50"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        window.db = getFirestore(app);
+    </script>
+    
     <style>
-        .thank-you-container {
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2980, #26d0ce);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 20px;
+        }
+        
+        .thank-you-container {
+            width: 100%;
+            max-width: 800px;
         }
         
         .thank-you-card {
             background: white;
-            padding: 50px;
             border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
             text-align: center;
-            max-width: 600px;
-            width: 100%;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
         }
         
-        .checkmark {
-            width: 100px;
-            height: 100px;
-            background: #27ae60;
+        .thank-you-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #3498db, #2ecc71, #9b59b6);
+        }
+        
+        .success-icon {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
             border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             margin: 0 auto 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: bounce 1s ease infinite alternate;
         }
         
-        .checkmark i {
-            font-size: 50px;
+        .success-icon i {
+            font-size: 60px;
             color: white;
         }
         
-        .thank-you-card h1 {
+        @keyframes bounce {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-10px); }
+        }
+        
+        h1 {
             color: #2c3e50;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            font-size: 2.8rem;
         }
         
-        .thank-you-card p {
+        .subtitle {
             color: #7f8c8d;
-            margin-bottom: 10px;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            line-height: 1.6;
         }
         
-        .donation-details {
+        .radhey-tag {
+            color: #3498db;
+            font-weight: bold;
+            font-size: 1.3rem;
+            margin: 10px 0;
+        }
+        
+        .receipt-box {
             background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
+            border-radius: 15px;
+            padding: 30px;
             margin: 30px 0;
             text-align: left;
+            border-left: 5px solid #3498db;
         }
         
-        .next-steps {
-            margin-top: 30px;
-            text-align: left;
-        }
-        
-        .next-steps li {
-            margin-bottom: 10px;
+        .receipt-box h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
             gap: 10px;
+        }
+        
+        .receipt-box h3 i {
+            color: #3498db;
+        }
+        
+        .receipt-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .detail-item {
+            margin-bottom: 12px;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: #555;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .detail-value {
+            color: #2c3e50;
+            font-size: 1.1rem;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            background: #27ae60;
+            color: white;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        
+        .next-steps {
+            background: #fff9e6;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 30px 0;
+            text-align: left;
+            border-left: 5px solid #f39c12;
+        }
+        
+        .next-steps h3 {
+            color: #e67e22;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .steps-list {
+            list-style: none;
+        }
+        
+        .steps-list li {
+            margin-bottom: 15px;
+            padding-left: 30px;
+            position: relative;
+            color: #7f8c8d;
+        }
+        
+        .steps-list li i {
+            position: absolute;
+            left: 0;
+            top: 2px;
+            color: #3498db;
         }
         
         .action-buttons {
             display: flex;
             gap: 15px;
             justify-content: center;
-            margin-top: 30px;
+            margin: 30px 0;
             flex-wrap: wrap;
         }
         
         .action-btn {
             padding: 15px 30px;
-            border-radius: 8px;
+            border-radius: 50px;
             text-decoration: none;
             font-weight: 600;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 10px;
-            transition: transform 0.3s;
-        }
-        
-        .action-btn:hover {
-            transform: translateY(-3px);
+            transition: all 0.3s ease;
+            min-width: 200px;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
         }
         
         .whatsapp-btn {
@@ -101,46 +224,136 @@
             color: white;
         }
         
+        .whatsapp-btn:hover {
+            background: #1da851;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3);
+        }
+        
         .home-btn {
             background: #3498db;
             color: white;
+        }
+        
+        .home-btn:hover {
+            background: #2980b9;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
         }
         
         .donate-again-btn {
             background: #9b59b6;
             color: white;
         }
+        
+        .donate-again-btn:hover {
+            background: #8e44ad;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(155, 89, 182, 0.3);
+        }
+        
+        .contact-info {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px dashed #eee;
+            color: #7f8c8d;
+        }
+        
+        .contact-info p {
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .quote-box {
+            background: #f4ecf7;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 25px;
+            font-style: italic;
+            color: #7d3c98;
+            border-left: 4px solid #9b59b6;
+        }
+        
+        .countdown {
+            color: #e74c3c;
+            font-weight: bold;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .thank-you-card {
+                padding: 25px 20px;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .action-btn {
+                min-width: 100%;
+                margin-bottom: 10px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .receipt-details {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Animation for new donation */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .new-donation {
+            animation: pulse 2s ease infinite;
+        }
     </style>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="thank-you-container">
-        <div class="thank-you-card">
-            <div class="checkmark">
+        <div class="thank-you-card" id="thankYouCard">
+            <div class="success-icon">
                 <i class="fas fa-check"></i>
             </div>
             
-            <h1>Thank You for Your Generous Donation!</h1>
+            <h1>Thank You! 🙏</h1>
+            <p class="subtitle">Your generous donation has been received successfully.</p>
+            <p class="radhey-tag">#RADHEY - "Your small contribution means a lot"</p>
             
-            <p>Your contribution is making a real difference in someone's life.</p>
-            <p><strong>#RADHEY</strong> and the entire Helper Hands team appreciate your support.</p>
-            
-            <div class="donation-details" id="donationDetails">
-                <!-- Details will be populated by JavaScript -->
+            <div class="receipt-box">
+                <h3><i class="fas fa-receipt"></i> Donation Receipt</h3>
+                <div class="receipt-details" id="receiptDetails">
+                    <!-- Dynamic content will be inserted here -->
+                </div>
             </div>
             
             <div class="next-steps">
-                <h3><i class="fas fa-list-check"></i> What Happens Next:</h3>
-                <ul>
-                    <li><i class="fas fa-envelope"></i> You'll receive a confirmation email within 24 hours</li>
-                    <li><i class="fas fa-camera"></i> We'll send pictures of the meals within 6-7 days</li>
-                    <li><i class="fas fa-comment"></i> Our team will contact you on WhatsApp for verification</li>
-                    <li><i class="fas fa-shield-alt"></i> Your donation is being processed securely</li>
+                <h3><i class="fas fa-list-check"></i> What Happens Next?</h3>
+                <ul class="steps-list">
+                    <li><i class="fas fa-envelope"></i> Confirmation email within 24 hours</li>
+                    <li><i class="fas fa-camera"></i> Meal pictures within 6-7 days</li>
+                    <li><i class="fab fa-whatsapp"></i> WhatsApp verification from our team</li>
+                    <li><i class="fas fa-shield-alt"></i> Secure processing of your donation</li>
+                    <li><i class="fas fa-heart"></i> You've made a real difference!</li>
                 </ul>
             </div>
             
             <div class="action-buttons">
-                <a href="https://wa.me/917304937349" class="action-btn whatsapp-btn" target="_blank">
-                    <i class="fab fa-whatsapp"></i> Contact on WhatsApp
+                <a href="https://wa.me/917304937349" class="action-btn whatsapp-btn" target="_blank" id="whatsappBtn">
+                    <i class="fab fa-whatsapp"></i> WhatsApp Us
                 </a>
                 
                 <a href="index.html" class="action-btn home-btn">
@@ -152,63 +365,231 @@
                 </a>
             </div>
             
-            <div style="margin-top: 30px; color: #95a5a6; font-size: 0.9rem;">
-                <p><i class="fas fa-phone"></i> Need immediate assistance? Call +91 7304937349</p>
-                <p><i class="fas fa-envelope"></i> Email: radheyjii@outlook.in</p>
-                <p style="margin-top: 20px; font-style: italic;">"Your small contribution means a lot"</p>
+            <div class="contact-info">
+                <p><i class="fas fa-phone"></i> Need help? Call: <strong>+91 7304937349</strong></p>
+                <p><i class="fas fa-envelope"></i> Email: <strong>radheyjii@outlook.in</strong></p>
+                <p><i class="fas fa-clock"></i> 24/7 Support Available</p>
+            </div>
+            
+            <div class="quote-box">
+                "WE FOR YOU" - Helping the ones who needs the most
+            </div>
+            
+            <p class="countdown" id="countdown">Redirecting to home page in 60 seconds...</p>
+            
+            <div style="margin-top: 20px; color: #bdc3c7; font-size: 0.9rem;">
+                <p><i class="fas fa-info-circle"></i> Receipt has been saved to your account</p>
+                <p style="margin-top: 10px; font-size: 0.8rem;">Helper Hands | Made with <i class="fas fa-heart" style="color: #e74c3c;"></i> by Radhey</p>
             </div>
         </div>
     </div>
-    
+
     <script>
         // Get donation details from URL parameters
         const urlParams = new URLSearchParams(window.location.search);
-        const name = urlParams.get('name') || 'Donor';
+        const name = urlParams.get('name') || 'Valued Donor';
         const amount = urlParams.get('amount') || '0';
-        const type = urlParams.get('type') || 'donation';
+        const type = urlParams.get('type') || 'general';
+        const donationId = urlParams.get('id') || generateReceiptNumber();
         
-        // Update donation details
-        const detailsDiv = document.getElementById('donationDetails');
+        // Map type to readable text
         const typeText = {
-            'child': 'Child Meal Donation',
-            'dog': 'Dog Meal Donation',
-            'both': 'Child & Dog Meal Donation',
-            'owner': 'Owner Support Donation'
+            'child': 'Child Meal Donation 🧒',
+            'dog': 'Dog Meal Donation 🐕',
+            'both': 'Child & Dog Meal Donation 👨‍👩‍👧‍👦🐕',
+            'owner': 'Support Our Operations 💼',
+            'general': 'General Donation'
         };
         
-        detailsDiv.innerHTML = `
-            <h3><i class="fas fa-receipt"></i> Donation Summary</h3>
-            <p><strong>Name:</strong> ${decodeURIComponent(name)}</p>
-            <p><strong>Amount:</strong> ₹${amount}</p>
-            <p><strong>Type:</strong> ${typeText[type] || 'General Donation'}</p>
-            <p><strong>Date:</strong> ${new Date().toLocaleDateString('en-IN', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            })}</p>
-            <p><strong>Transaction ID:</strong> TH${Date.now().toString().slice(-8)}</p>
+        // Map type to icon
+        const typeIcon = {
+            'child': 'fas fa-child',
+            'dog': 'fas fa-paw',
+            'both': 'fas fa-hands-helping',
+            'owner': 'fas fa-user-tie',
+            'general': 'fas fa-heart'
+        };
+        
+        // Generate receipt number
+        function generateReceiptNumber() {
+            return 'HH' + Date.now().toString().slice(-8);
+        }
+        
+        const receiptNo = donationId.startsWith('HH') ? donationId : generateReceiptNumber();
+        const transactionDate = new Date();
+        
+        // Format date
+        const formattedDate = transactionDate.toLocaleDateString('en-IN', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
+        // Update receipt details
+        const receiptDiv = document.getElementById('receiptDetails');
+        receiptDiv.innerHTML = `
+            <div class="detail-item">
+                <span class="detail-label">Donor Name:</span>
+                <span class="detail-value">${decodeURIComponent(name)}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Donation Amount:</span>
+                <span class="detail-value" style="color: #27ae60; font-size: 1.3rem; font-weight: bold;">₹${amount}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Donation Type:</span>
+                <span class="detail-value">
+                    <i class="${typeIcon[type] || 'fas fa-heart'}"></i> ${typeText[type] || 'General Donation'}
+                </span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Receipt Number:</span>
+                <span class="detail-value" style="font-family: monospace;">${receiptNo}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Transaction Date:</span>
+                <span class="detail-value">${formattedDate}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Status:</span>
+                <span class="status-badge">✓ Payment Received</span>
+            </div>
+            ${donationId ? `
+            <div class="detail-item">
+                <span class="detail-label">Transaction ID:</span>
+                <span class="detail-value" style="font-size: 0.9rem; color: #7f8c8d;">${donationId}</span>
+            </div>` : ''}
         `;
+        
+        // Update WhatsApp button with message
+        const whatsappBtn = document.getElementById('whatsappBtn');
+        const whatsappMessage = encodeURIComponent(
+            `Namaste ${decodeURIComponent(name)}! 🙏\n\n` +
+            `Thank you for donating ₹${amount} to Helper Hands!\n` +
+            `Receipt No: ${receiptNo}\n` +
+            `Type: ${typeText[type]}\n\n` +
+            `We'll send you pictures within 6-7 days.\n` +
+            `Jai Shree Krishna! 🙏\n` +
+            `#RADHEY - Helper Hands Team\n` +
+            `"WE FOR YOU" 💙`
+        );
+        whatsappBtn.href = `https://wa.me/917304937349?text=${whatsappMessage}`;
         
         // Store in localStorage for admin access
         const donationRecord = {
-            id: 'TH' + Date.now().toString().slice(-8),
+            id: donationId,
             name: decodeURIComponent(name),
+            email: '', // Will be updated from form if available
             amount: parseFloat(amount),
             type: type,
-            timestamp: new Date().toISOString(),
-            status: 'pending'
+            timestamp: transactionDate.toISOString(),
+            status: 'received',
+            receiptNo: receiptNo,
+            paymentVerified: false,
+            fromThankYouPage: true
         };
         
-        // Save to localStorage (in production, this would go to your database)
+        // Check if we have email in localStorage from form
+        try {
+            const recentDonation = JSON.parse(localStorage.getItem('recentDonation'));
+            if (recentDonation && recentDonation.email) {
+                donationRecord.email = recentDonation.email;
+                donationRecord.phone = recentDonation.phone || '';
+                donationRecord.instagram = recentDonation.instagram || '';
+                donationRecord.whatsapp = recentDonation.whatsapp || false;
+                donationRecord.message = recentDonation.message || '';
+            }
+        } catch (e) {
+            console.log('No recent donation data found');
+        }
+        
+        // Save to localStorage
         let donations = JSON.parse(localStorage.getItem('helperHandsDonations') || '[]');
         donations.push(donationRecord);
         localStorage.setItem('helperHandsDonations', JSON.stringify(donations));
         
-        // Auto-redirect after 30 seconds
-        setTimeout(() => {
-            window.location.href = 'index.html';
-        }, 30000);
+        // Also save as recent donation for admin reference
+        localStorage.setItem('recentDonation', JSON.stringify(donationRecord));
+        
+        // Try to save to Firebase
+        try {
+            if (window.db) {
+                import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js")
+                    .then(({ collection, addDoc, serverTimestamp }) => {
+                        addDoc(collection(db, "donations"), {
+                            ...donationRecord,
+                            createdAt: serverTimestamp(),
+                            updatedAt: serverTimestamp(),
+                            pageSource: 'thankyou.html'
+                        }).then(docRef => {
+                            console.log('Saved to Firebase with ID:', docRef.id);
+                        }).catch(error => {
+                            console.log('Firebase save failed, using localStorage only:', error);
+                        });
+                    });
+            }
+        } catch (error) {
+            console.log('Firebase not available, using localStorage:', error);
+        }
+        
+        // Add pulse animation to card
+        document.getElementById('thankYouCard').classList.add('new-donation');
+        
+        // Auto-redirect to home after 60 seconds
+        let countdown = 60;
+        const countdownElement = document.getElementById('countdown');
+        
+        const countdownInterval = setInterval(() => {
+            countdownElement.textContent = `Redirecting to home page in ${countdown} seconds...`;
+            countdown--;
+            
+            if (countdown < 0) {
+                clearInterval(countdownInterval);
+                window.location.href = 'index.html';
+            }
+        }, 1000);
+        
+        // Stop auto-redirect if user interacts
+        let userInteracted = false;
+        
+        document.addEventListener('click', () => {
+            userInteracted = true;
+            clearInterval(countdownInterval);
+            countdownElement.textContent = 'Auto-redirect cancelled. Click buttons above to navigate.';
+            countdownElement.style.color = '#7f8c8d';
+        });
+        
+        document.addEventListener('keydown', () => {
+            userInteracted = true;
+            clearInterval(countdownInterval);
+            countdownElement.textContent = 'Auto-redirect cancelled. Click buttons above to navigate.';
+            countdownElement.style.color = '#7f8c8d';
+        });
+        
+        // Add print functionality
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                window.print();
+            }
+        });
+        
+        // Add print button dynamically
+        const printBtn = document.createElement('button');
+        printBtn.className = 'action-btn';
+        printBtn.innerHTML = '<i class="fas fa-print"></i> Print Receipt';
+        printBtn.style.background = '#95a5a6';
+        printBtn.onclick = () => window.print();
+        
+        // Add print button to action buttons
+        const actionButtons = document.querySelector('.action-buttons');
+        if (actionButtons) {
+            const clone = printBtn.cloneNode(true);
+            actionButtons.appendChild(clone);
+        }
     </script>
 </body>
 </html>
