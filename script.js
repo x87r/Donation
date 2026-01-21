@@ -1,4 +1,22 @@
-// DOM Elements
+// === FIREBASE CONFIGURATION ===
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, serverTimestamp, getDocs, orderBy, query, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// Your Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyCP-uKQ7rZqNvT1CnW5QiWnkzclHGix_5Q",
+  authDomain: "vasudevdonations.firebaseapp.com",
+  projectId: "vasudevdonations",
+  storageBucket: "vasudevdonations.firebasestorage.app",
+  messagingSenderId: "219370651633",
+  appId: "1:219370651633:web:98146244613a1e50f90e50"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// === DOM Elements ===
 const donationModal = document.getElementById('donationModal');
 const ownerModal = document.getElementById('ownerModal');
 const donationForm = document.getElementById('donationForm');
@@ -7,82 +25,49 @@ const modalTitle = document.getElementById('modalTitle');
 const qrImage = document.getElementById('qrImage');
 const donationTypeField = document.getElementById('donationType');
 const timerElement = document.getElementById('timer');
-
-// MongoDB Configuration
-const MONGODB_URL = 'mongodb+srv://Donations:Radheyjii@outlook.in@cluster0.kbm4nfh.mongodb.net/?appName=Cluster0';
-const API_ENDPOINT = 'https://your-backend-api.com'; // Replace with actual backend
-
-// Donation Type Configuration
-const donationConfig = {
-    'child': {
-        title: 'Donate to Children',
-        qrImage: 'qr-child.png',
-        defaultAmount: 30
-    },
-    'dog': {
-        title: 'Donate to Dogs',
-        qrImage: 'qr-dog.png',
-        defaultAmount: 20
-    },
-    'both': {
-        title: 'Donate to Both',
-        qrImage: 'qr-child.png', // You can create a separate QR for both
-        defaultAmount: 50
-    }
-};
-
-// Mobile Menu Toggle
 const hamburger = document.querySelector('.hamburger');
 const navMenu = document.querySelector('.nav-menu');
 
-hamburger.addEventListener('click', () => {
-    hamburger.classList.toggle('active');
-    navMenu.classList.toggle('active');
-});
+// === Mobile Menu Toggle ===
+if (hamburger) {
+    hamburger.addEventListener('click', () => {
+        hamburger.classList.toggle('active');
+        navMenu.classList.toggle('active');
+    });
+}
 
 // Close mobile menu when clicking outside
 document.addEventListener('click', (e) => {
-    if (!hamburger.contains(e.target) && !navMenu.contains(e.target)) {
+    if (hamburger && !hamburger.contains(e.target) && navMenu && !navMenu.contains(e.target)) {
         hamburger.classList.remove('active');
         navMenu.classList.remove('active');
     }
 });
 
-// Open Donation Modal
+// === Donation Configuration ===
+const donationConfig = {
+    'child': {
+        title: 'Donate to Children',
+        qrImage: 'qr-child.png',
+        defaultAmount: 30,
+        description: 'Provide nutritious meals to underprivileged children'
+    },
+    'dog': {
+        title: 'Donate to Dogs',
+        qrImage: 'qr-dog.png',
+        defaultAmount: 20,
+        description: 'Feed stray dogs and give them a better life'
+    },
+    'both': {
+        title: 'Donate to Both',
+        qrImage: 'qr-child.png',
+        defaultAmount: 50,
+        description: 'Support both children and dogs simultaneously'
+    }
+};
+
+// === Timer Function ===
 let timerInterval;
-function openDonationForm(type) {
-    const config = donationConfig[type];
-    modalTitle.textContent = config.title;
-    qrImage.src = config.qrImage;
-    donationTypeField.value = type;
-    document.getElementById('amount').value = config.defaultAmount;
-    
-    // Start timer
-    startTimer(5 * 60); // 5 minutes
-    
-    donationModal.style.display = 'block';
-    document.body.style.overflow = 'hidden';
-}
-
-// Open Owner Donation Modal
-function openOwnerDonation() {
-    ownerModal.style.display = 'block';
-    document.body.style.overflow = 'hidden';
-}
-
-// Close Modals
-function closeModal() {
-    donationModal.style.display = 'none';
-    document.body.style.overflow = 'auto';
-    clearInterval(timerInterval);
-}
-
-function closeOwnerModal() {
-    ownerModal.style.display = 'none';
-    document.body.style.overflow = 'auto';
-}
-
-// Timer Function
 function startTimer(seconds) {
     let timeLeft = seconds;
     
@@ -90,11 +75,13 @@ function startTimer(seconds) {
         const minutes = Math.floor(timeLeft / 60);
         const secs = timeLeft % 60;
         
-        timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        if (timerElement) {
+            timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
         
         if (timeLeft <= 0) {
             clearInterval(timerInterval);
-            alert('Payment time expired. Please try again.');
+            alert('⏰ Payment time expired! Please restart donation.');
             closeModal();
         }
         
@@ -102,115 +89,273 @@ function startTimer(seconds) {
     }, 1000);
 }
 
-// Handle Donation Form Submission
-donationForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
+// === Modal Functions ===
+function openDonationForm(type) {
+    const config = donationConfig[type];
+    if (!config) return;
     
-    const formData = {
-        name: document.getElementById('name').value,
-        email: document.getElementById('email').value,
-        phone: document.getElementById('phone').value || null,
-        instagram: document.getElementById('instagram').value || null,
-        amount: parseFloat(document.getElementById('amount').value),
-        type: donationTypeField.value,
-        message: document.getElementById('message').value || null,
-        whatsapp: document.getElementById('whatsapp').checked,
-        timestamp: new Date().toISOString()
-    };
+    if (modalTitle) modalTitle.textContent = config.title;
+    if (qrImage) qrImage.src = config.qrImage;
+    if (donationTypeField) donationTypeField.value = type;
     
-    // Validate amount
-    const minAmount = donationConfig[formData.type].defaultAmount;
-    if (formData.amount < minAmount) {
-        alert(`Minimum donation amount for ${formData.type} is ₹${minAmount}`);
-        return;
+    const amountInput = document.getElementById('amount');
+    if (amountInput) amountInput.value = config.defaultAmount;
+    
+    // Start timer (5 minutes)
+    startTimer(5 * 60);
+    
+    if (donationModal) {
+        donationModal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
     }
-    
-    try {
-        // Save to MongoDB (you'll need a backend API)
-        const response = await saveDonation(formData);
-        
-        if (response.success) {
-            // Redirect to thank you page
-            window.location.href = `thankyou.html?name=${encodeURIComponent(formData.name)}&amount=${formData.amount}&type=${formData.type}`;
-        }
-    } catch (error) {
-        console.error('Error saving donation:', error);
-        alert('Error processing donation. Please try again or contact support.');
-    }
-});
+}
 
-// Handle Owner Donation Form Submission
-ownerDonationForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const ownerData = {
-        name: document.getElementById('ownerName').value,
-        email: document.getElementById('ownerEmail').value,
-        amount: parseFloat(document.getElementById('ownerAmount').value),
-        type: 'owner',
-        upiId: '9797590308@fam',
-        timestamp: new Date().toISOString()
-    };
-    
-    try {
-        const response = await saveDonation(ownerData);
-        
-        if (response.success) {
-            alert('Thank you for supporting our operations! We appreciate your contribution.');
-            closeOwnerModal();
-            ownerDonationForm.reset();
-        }
-    } catch (error) {
-        console.error('Error saving owner donation:', error);
-        alert('Error processing donation. Please try again.');
+function openOwnerDonation() {
+    if (ownerModal) {
+        ownerModal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
     }
-});
+}
 
-// Save donation to database
+function closeModal() {
+    if (donationModal) {
+        donationModal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+    clearInterval(timerInterval);
+}
+
+function closeOwnerModal() {
+    if (ownerModal) {
+        ownerModal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+}
+
+// === Save Donation to Firebase ===
 async function saveDonation(data) {
-    // This is a mock function. In production, you'll need a backend API
-    // that connects to MongoDB
-    
-    // For Netlify/GitHub Pages static hosting, you'll need to use:
-    // 1. Netlify Functions for backend
-    // 2. Or a separate backend service like Firebase, Supabase, or a Node.js server
-    
-    console.log('Saving donation:', data);
-    
-    // Example using fetch to your backend API
-    /*
-    const response = await fetch(`${API_ENDPOINT}/donations`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data)
-    });
-    
-    return await response.json();
-    */
-    
-    // For now, return mock success
-    return { success: true, id: 'mock_' + Date.now() };
+    try {
+        // Show loading
+        showLoading();
+        
+        // Add donation to Firestore
+        const docRef = await addDoc(collection(db, "donations"), {
+            name: data.name,
+            email: data.email,
+            phone: data.phone || "",
+            amount: Number(data.amount),
+            type: data.type,
+            instagram: data.instagram || "",
+            whatsapp: data.whatsapp || false,
+            message: data.message || "",
+            status: "pending",
+            paymentVerified: false,
+            receiptSent: false,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp()
+        });
+
+        console.log("Donation saved with ID: ", docRef.id);
+        
+        // Hide loading
+        hideLoading();
+        
+        // Show success message
+        showSuccessMessage("✅ Donation saved successfully!\n\nWe'll contact you within 24 hours on WhatsApp.");
+        
+        // Save to localStorage as backup
+        saveToLocalStorage(data, docRef.id);
+        
+        // Redirect to thank you page after 2 seconds
+        setTimeout(() => {
+            window.location.href = `thankyou.html?name=${encodeURIComponent(data.name)}&amount=${data.amount}&type=${data.type}&id=${docRef.id}`;
+        }, 2000);
+
+        return { success: true, id: docRef.id };
+        
+    } catch (error) {
+        console.error("Error saving donation: ", error);
+        hideLoading();
+        
+        // Fallback to localStorage
+        const localId = saveToLocalStorage(data);
+        
+        showWarningMessage("⚠️ Internet issue! Donation saved locally.\n\nPlease WhatsApp us: +91 7304937349\nWe'll manually verify your payment.");
+        
+        setTimeout(() => {
+            window.location.href = `thankyou.html?name=${encodeURIComponent(data.name)}&amount=${data.amount}&type=${data.type}&id=local_${localId}`;
+        }, 2000);
+        
+        return { success: true, id: localId };
+    }
 }
 
-// Close modal when clicking outside
-window.onclick = function(event) {
-    if (event.target === donationModal) {
+// === Local Storage Backup ===
+function saveToLocalStorage(data, donationId = null) {
+    try {
+        const id = donationId || 'local_' + Date.now();
+        const donation = {
+            ...data,
+            id: id,
+            timestamp: new Date().toISOString(),
+            status: 'pending_local',
+            local: true
+        };
+        
+        let donations = JSON.parse(localStorage.getItem('helperHandsDonations') || '[]');
+        donations.push(donation);
+        localStorage.setItem('helperHandsDonations', JSON.stringify(donations));
+        
+        return id;
+    } catch (error) {
+        console.error('Error saving to localStorage:', error);
+        return 'error_' + Date.now();
+    }
+}
+
+// === UI Helper Functions ===
+function showLoading() {
+    const loader = document.createElement('div');
+    loader.id = 'loader';
+    loader.innerHTML = `
+        <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                    background: rgba(0,0,0,0.7); display: flex; justify-content: center; 
+                    align-items: center; z-index: 9999;">
+            <div style="background: white; padding: 30px; border-radius: 10px; text-align: center;">
+                <div class="spinner" style="width: 50px; height: 50px; border: 5px solid #f3f3f3;
+                         border-top: 5px solid #3498db; border-radius: 50%; 
+                         animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
+                <p style="font-size: 18px; color: #333;">Saving your donation...</p>
+                <p style="font-size: 14px; color: #666;">Please don't close this window</p>
+            </div>
+        </div>
+        <style>
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        </style>
+    `;
+    document.body.appendChild(loader);
+}
+
+function hideLoading() {
+    const loader = document.getElementById('loader');
+    if (loader) {
+        loader.remove();
+    }
+}
+
+function showSuccessMessage(message) {
+    const alertDiv = document.createElement('div');
+    alertDiv.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #27ae60;
+        color: white;
+        padding: 15px 25px;
+        border-radius: 5px;
+        z-index: 10000;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        max-width: 400px;
+    `;
+    alertDiv.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+    document.body.appendChild(alertDiv);
+    
+    setTimeout(() => {
+        alertDiv.remove();
+    }, 5000);
+}
+
+function showWarningMessage(message) {
+    const alertDiv = document.createElement('div');
+    alertDiv.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #f39c12;
+        color: white;
+        padding: 15px 25px;
+        border-radius: 5px;
+        z-index: 10000;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        max-width: 400px;
+    `;
+    alertDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${message}`;
+    document.body.appendChild(alertDiv);
+    
+    setTimeout(() => {
+        alertDiv.remove();
+    }, 7000);
+}
+
+// === Event Listeners ===
+if (donationForm) {
+    donationForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const formData = {
+            name: document.getElementById('name').value.trim(),
+            email: document.getElementById('email').value.trim(),
+            phone: document.getElementById('phone').value.trim(),
+            instagram: document.getElementById('instagram').value.trim(),
+            amount: document.getElementById('amount').value,
+            type: document.getElementById('donationType').value,
+            message: document.getElementById('message').value.trim(),
+            whatsapp: document.getElementById('whatsapp')?.checked || false
+        };
+        
+        // Basic validation
+        if (!formData.name || !formData.email || !formData.amount) {
+            alert('❌ Please fill all required fields (*)');
+            return;
+        }
+        
+        // Validate amount based on type
+        const minAmount = donationConfig[formData.type]?.defaultAmount || 1;
+        if (parseFloat(formData.amount) < minAmount) {
+            alert(`Minimum donation for ${formData.type} is ₹${minAmount}`);
+            return;
+        }
+        
+        // Save donation
+        await saveDonation(formData);
+        
+        // Reset form
+        donationForm.reset();
         closeModal();
-    }
-    if (event.target === ownerModal) {
+    });
+}
+
+if (ownerDonationForm) {
+    ownerDonationForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const formData = {
+            name: document.getElementById('ownerName').value.trim(),
+            email: document.getElementById('ownerEmail').value.trim(),
+            amount: document.getElementById('ownerAmount').value,
+            type: 'owner',
+            phone: '',
+            whatsapp: false
+        };
+        
+        if (!formData.name || !formData.email || !formData.amount) {
+            alert('❌ Please fill all required fields');
+            return;
+        }
+        
+        await saveDonation(formData);
+        
+        alert('🙏 Thank you for supporting our operations!\n\nPlease send payment to UPI: 9797590308@fam\nThen WhatsApp us: +91 7304937349');
+        
+        ownerDonationForm.reset();
         closeOwnerModal();
-    }
+    });
 }
 
-// WhatsApp Contact
-function openWhatsApp() {
-    const message = encodeURIComponent("Hello Helper Hands, I'd like to know more about your donation process.");
-    window.open(`https://wa.me/917304937349?text=${message}`, '_blank');
-}
-
-// Initialize
+// === Smooth Scrolling ===
 document.addEventListener('DOMContentLoaded', () => {
     // Smooth scrolling for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -227,12 +372,33 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 
                 // Close mobile menu if open
-                hamburger.classList.remove('active');
-                navMenu.classList.remove('active');
+                if (hamburger) hamburger.classList.remove('active');
+                if (navMenu) navMenu.classList.remove('active');
             }
         });
     });
     
-    // Add current year to footer
-    document.getElementById('currentYear').textContent = new Date().getFullYear();
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        if (event.target === donationModal) {
+            closeModal();
+        }
+        if (event.target === ownerModal) {
+            closeOwnerModal();
+        }
+    }
+    
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeModal();
+            closeOwnerModal();
+        }
+    });
 });
+
+// === WhatsApp Function ===
+function openWhatsApp() {
+    const message = encodeURIComponent("Hello Helper Hands, I'd like to know more about your donation process.");
+    window.open(`https://wa.me/917304937349?text=${message}`, '_blank');
+}
