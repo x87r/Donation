@@ -4,394 +4,1471 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Helper Hands - Donate Meals to Children & Dogs</title>
-    
-    <!-- ===== FIREBASE SDK ===== -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        
-        const firebaseConfig = {
-            apiKey: "AIzaSyCP-uKQ7rZqNvT1CnW5QiWnkzclHGix_5Q",
-            authDomain: "vasudevdonations.firebaseapp.com",
-            projectId: "vasudevdonations",
-            storageBucket: "vasudevdonations.firebasestorage.app",
-            messagingSenderId: "219370651633",
-            appId: "1:219370651633:web:98146244613a1e50f90e50"
-        };
-        
-        const app = initializeApp(firebaseConfig);
-        window.db = getFirestore(app);
-    </script>
-    <!-- ===== END FIREBASE ===== -->
-    
-    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-light: #3b82f6;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --gray: #64748b;
+            --light-gray: #e2e8f0;
+            --white: #ffffff;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: var(--light);
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header */
+        header {
+            background-color: var(--white);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+        
+        .logo-text h1 {
+            font-size: 24px;
+            margin-bottom: 0;
+            color: var(--primary);
+        }
+        
+        .logo-text p {
+            font-size: 12px;
+            color: var(--gray);
+            margin-top: -5px;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+        
+        nav a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        nav a:hover {
+            color: var(--primary);
+        }
+        
+        nav a.active {
+            color: var(--primary);
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--primary);
+            cursor: pointer;
+        }
+        
+        /* Hero */
+        .hero {
+            background: linear-gradient(rgba(30, 58, 138, 0.9), rgba(59, 130, 246, 0.8)), url('https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 100px 0;
+            text-align: center;
+        }
+        
+        .hero h2 {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        
+        .hero p {
+            font-size: 20px;
+            max-width: 800px;
+            margin: 0 auto 30px;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background-color: var(--accent);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 18px;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .cta-button:hover {
+            background-color: #d97706;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Donation Cards */
+        .section-title {
+            text-align: center;
+            margin: 60px 0 40px;
+            color: var(--primary);
+        }
+        
+        .donation-options {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 80px;
+        }
+        
+        .donation-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            width: 100%;
+            max-width: 350px;
+            transition: transform 0.3s;
+        }
+        
+        .donation-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .card-header {
+            padding: 30px 20px;
+            text-align: center;
+            color: white;
+        }
+        
+        .child-header {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        }
+        
+        .dog-header {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+        
+        .owner-header {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+        }
+        
+        .both-header {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+        
+        .card-icon {
+            font-size: 50px;
+            margin-bottom: 15px;
+        }
+        
+        .card-price {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .card-desc {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .card-body {
+            padding: 25px;
+        }
+        
+        .card-body ul {
+            list-style: none;
+            margin-bottom: 25px;
+        }
+        
+        .card-body li {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--light-gray);
+            display: flex;
+            align-items: center;
+        }
+        
+        .card-body li i {
+            margin-right: 10px;
+            color: var(--secondary);
+        }
+        
+        .donate-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            text-align: center;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .donate-btn:hover {
+            background-color: #1e40af;
+        }
+        
+        /* About & Contact */
+        .about-contact {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 40px;
+            margin-bottom: 80px;
+        }
+        
+        .about, .contact {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .info-card {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+        }
+        
+        .contact-info {
+            margin-top: 20px;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .contact-icon {
+            width: 40px;
+            height: 40px;
+            background-color: var(--light-gray);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: var(--primary);
+        }
+        
+        /* Footer */
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 60px 0 30px;
+        }
+        
+        .footer-content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .footer-section {
+            flex: 1;
+            min-width: 250px;
+        }
+        
+        .footer-logo .logo-icon {
+            background: linear-gradient(135deg, var(--primary-light), var(--secondary));
+        }
+        
+        .footer-links h3, .footer-contact h3 {
+            margin-bottom: 20px;
+            color: white;
+        }
+        
+        .footer-links ul {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-links a {
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid #334155;
+            color: #94a3b8;
+            font-size: 14px;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 10px;
+            overflow: hidden;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            padding: 20px;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .modal-body {
+            padding: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--light-gray);
+            border-radius: 5px;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .required::after {
+            content: " *";
+            color: #ef4444;
+        }
+        
+        .payment-info {
+            background-color: #fef3c7;
+            border: 1px solid #fcd34d;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .qr-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .qr-image {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            border: 2px solid var(--light-gray);
+        }
+        
+        .timer {
+            font-size: 18px;
+            font-weight: 600;
+            color: #dc2626;
+            text-align: center;
+            margin: 15px 0;
+        }
+        
+        /* Thank You Modal */
+        .thankyou-modal .modal-header {
+            background-color: var(--secondary);
+        }
+        
+        .thankyou-content {
+            text-align: center;
+            padding: 20px 0;
+        }
+        
+        .thankyou-icon {
+            font-size: 80px;
+            color: var(--secondary);
+            margin-bottom: 20px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav ul {
+                display: none;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .mobile-nav {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background-color: white;
+                box-shadow: var(--shadow);
+                padding: 20px;
+                z-index: 1000;
+            }
+            
+            .mobile-nav.active {
+                display: block;
+            }
+            
+            .mobile-nav ul {
+                list-style: none;
+            }
+            
+            .mobile-nav li {
+                margin-bottom: 15px;
+            }
+            
+            .mobile-nav a {
+                text-decoration: none;
+                color: var(--dark);
+                font-weight: 500;
+                display: block;
+                padding: 10px 0;
+            }
+            
+            .hero {
+                padding: 80px 0;
+            }
+            
+            .hero h2 {
+                font-size: 32px;
+            }
+            
+            .hero p {
+                font-size: 16px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="logo">
-                <img src="logo.png" alt="Helper Hands Logo" style="height: 40px; margin-right: 10px;">
-                <div>
-                    <h1>HELPER HANDS</h1>
-                    <p class="tagline">WE FOR YOU</p>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-hands-helping"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>Helper Hands</h1>
+                        <p>WE FOR YOU</p>
+                    </div>
                 </div>
+                
+                <nav class="desktop-nav">
+                    <ul>
+                        <li><a href="#home" class="active">Home</a></li>
+                        <li><a href="#donate">Donate</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                        <li><a href="#admin">Admin</a></li>
+                    </ul>
+                </nav>
+                
+                <button class="mobile-menu-btn" id="mobile-menu-btn">
+                    <i class="fas fa-bars"></i>
+                </button>
             </div>
-            <ul class="nav-menu">
-                <li><a href="#home">Home</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#donate">Donate</a></li>
-                <li><a href="#contact">Contact</a></li>
-                <li><a href="admin.html" class="admin-btn">Admin</a></li>
-            </ul>
-            <div class="hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
+            
+            <nav class="mobile-nav" id="mobile-nav">
+                <ul>
+                    <li><a href="#home" class="active">Home</a></li>
+                    <li><a href="#donate">Donate</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="#admin">Admin</a></li>
+                </ul>
+            </nav>
         </div>
-    </nav>
+    </header>
 
     <!-- Hero Section -->
-    <section id="home" class="hero">
-        <div class="hero-content">
-            <h1><span class="radhey">#RADHEY</span></h1>
-            <h2>"Your small contribution means a lot"</h2>
-            <p class="motto">HELPING THE ONES WHO NEEDS THE MOST</p>
-            <a href="#donate" class="cta-button">Donate Now <i class="fas fa-heart"></i></a>
-        </div>
-        <div class="hero-image">
-            <div class="floating-card">
-                <i class="fas fa-child"></i>
-                <h3>Child Meal</h3>
-                <p>₹30 per meal</p>
-            </div>
-            <div class="floating-card">
-                <i class="fas fa-paw"></i>
-                <h3>Dog Meal</h3>
-                <p>₹20 per meal</p>
-            </div>
+    <section class="hero" id="home">
+        <div class="container">
+            <h2>HELPING THE ONES WHO NEEDS THE MOST</h2>
+            <p>Your small contribution can provide meals to hungry children and stray dogs. Join us in making a difference, one meal at a time.</p>
+            <a href="#donate" class="cta-button">Donate Now</a>
         </div>
     </section>
 
-    <!-- About Section -->
-    <section id="about" class="about">
+    <!-- Donation Options -->
+    <section id="donate">
         <div class="container">
-            <h2 class="section-title">About Helper Hands</h2>
-            <div class="about-content">
-                <div class="about-text">
-                    <p>Founded by <strong>Radhey</strong>, Helper Hands is a non-profit initiative dedicated to providing meals to underprivileged children and stray dogs. Our motto "WE FOR YOU" reflects our commitment to serve those in need.</p>
-                    <p>Every donation, no matter how small, makes a significant difference. We ensure transparency by sending pictures and updates to donors within 6-7 days of their contribution.</p>
-                    <div class="stats">
-                        <div class="stat">
-                            <h3>5000+</h3>
-                            <p>Meals Provided</p>
-                        </div>
-                        <div class="stat">
-                            <h3>1000+</h3>
-                            <p>Donors</p>
-                        </div>
-                        <div class="stat">
-                            <h3>24/7</h3>
-                            <p>Support</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="about-image">
-                    <div class="owner-card">
-                        <h3>Website Owner</h3>
-                        <p><strong>Name:</strong> Radhey</p>
-                        <p><strong>Email:</strong> radheyjii@outlook.in</p>
-                        <p><strong>Phone:</strong> +91 7304937349</p>
-                        <p><strong>Support:</strong> 24/7 Available</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Donation Section -->
-    <section id="donate" class="donate">
-        <div class="container">
-            <h2 class="section-title">Make a Donation</h2>
-            <p class="section-subtitle">Choose where you want to make a difference</p>
-            
+            <h2 class="section-title">Choose Your Donation</h2>
             <div class="donation-options">
-                <!-- Child Donation -->
-                <div class="donation-card" id="child-card">
-                    <div class="card-header">
-                        <i class="fas fa-child"></i>
-                        <h3>Donate to Children</h3>
+                <!-- Child Donation Card -->
+                <div class="donation-card">
+                    <div class="card-header child-header">
+                        <div class="card-icon">
+                            <i class="fas fa-child"></i>
+                        </div>
+                        <h3>Feed a Child</h3>
+                        <div class="card-price">₹30</div>
+                        <div class="card-desc">Per meal</div>
                     </div>
                     <div class="card-body">
-                        <p class="price">₹30 per meal</p>
-                        <p>Provide nutritious meals to underprivileged children</p>
-                        <button class="donate-btn" onclick="openDonationForm('child')">Donate Now</button>
+                        <ul>
+                            <li><i class="fas fa-check-circle"></i> One nutritious meal for a child</li>
+                            <li><i class="fas fa-check-circle"></i> Receipt & photo sent via email</li>
+                            <li><i class="fas fa-check-circle"></i> WhatsApp confirmation</li>
+                            <li><i class="fas fa-check-circle"></i> 24/7 support available</li>
+                        </ul>
+                        <button class="donate-btn" onclick="openDonationForm('child', 30)">Donate for a Child</button>
                     </div>
                 </div>
-
-                <!-- Dog Donation -->
-                <div class="donation-card" id="dog-card">
-                    <div class="card-header">
-                        <i class="fas fa-paw"></i>
-                        <h3>Donate to Dogs</h3>
+                
+                <!-- Dog Donation Card -->
+                <div class="donation-card">
+                    <div class="card-header dog-header">
+                        <div class="card-icon">
+                            <i class="fas fa-dog"></i>
+                        </div>
+                        <h3>Feed a Dog</h3>
+                        <div class="card-price">₹20</div>
+                        <div class="card-desc">Per meal</div>
                     </div>
                     <div class="card-body">
-                        <p class="price">₹20 per meal</p>
-                        <p>Feed stray dogs and give them a better life</p>
-                        <button class="donate-btn" onclick="openDonationForm('dog')">Donate Now</button>
+                        <ul>
+                            <li><i class="fas fa-check-circle"></i> One wholesome meal for a stray dog</li>
+                            <li><i class="fas fa-check-circle"></i> Receipt & photo sent via email</li>
+                            <li><i class="fas fa-check-circle"></i> WhatsApp confirmation</li>
+                            <li><i class="fas fa-check-circle"></i> 24/7 support available</li>
+                        </ul>
+                        <button class="donate-btn" onclick="openDonationForm('dog', 20)">Donate for a Dog</button>
                     </div>
                 </div>
-
-                <!-- Both -->
-                <div class="donation-card" id="both-card">
-                    <div class="card-header">
-                        <i class="fas fa-hands-helping"></i>
-                        <h3>Donate to Both</h3>
+                
+                <!-- Both Donation Card -->
+                <div class="donation-card">
+                    <div class="card-header both-header">
+                        <div class="card-icon">
+                            <i class="fas fa-hands-helping"></i>
+                        </div>
+                        <h3>Feed Both</h3>
+                        <div class="card-price">₹50</div>
+                        <div class="card-desc">Child + Dog meal</div>
                     </div>
                     <div class="card-body">
-                        <p class="price">₹50 for both</p>
-                        <p>Support both children and dogs simultaneously</p>
-                        <button class="donate-btn" onclick="openDonationForm('both')">Donate Now</button>
+                        <ul>
+                            <li><i class="fas fa-check-circle"></i> One meal for child AND one for dog</li>
+                            <li><i class="fas fa-check-circle"></i> Receipt & photos sent via email</li>
+                            <li><i class="fas fa-check-circle"></i> WhatsApp confirmation</li>
+                            <li><i class="fas fa-check-circle"></i> Double the impact!</li>
+                        </ul>
+                        <button class="donate-btn" onclick="openDonationForm('both', 50)">Donate for Both</button>
                     </div>
                 </div>
-
-                <!-- Owner Support -->
-                <div class="donation-card" id="owner-card">
-                    <div class="card-header">
-                        <i class="fas fa-user-tie"></i>
-                        <h3>Support Owner</h3>
+                
+                <!-- Owner Support Card -->
+                <div class="donation-card">
+                    <div class="card-header owner-header">
+                        <div class="card-icon">
+                            <i class="fas fa-hands"></i>
+                        </div>
+                        <h3>Support Our Work</h3>
+                        <div class="card-price">Any Amount</div>
+                        <div class="card-desc">Help us continue our mission</div>
                     </div>
                     <div class="card-body">
-                        <p class="price">Any Amount</p>
-                        <p>Support our operations and maintenance</p>
-                        <button class="donate-btn" onclick="openOwnerDonation()">Donate Now</button>
+                        <ul>
+                            <li><i class="fas fa-check-circle"></i> Support operational costs</li>
+                            <li><i class="fas fa-check-circle"></i> Help us reach more in need</li>
+                            <li><i class="fas fa-check-circle"></i> Any amount is appreciated</li>
+                            <li><i class="fas fa-check-circle"></i> UPI ID: 9797590308@fam</li>
+                        </ul>
+                        <button class="donate-btn" onclick="openOwnerDonation()">Support Our Work</button>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Donation Modal -->
-    <div id="donationModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <h2 id="modalTitle">Donate to Children</h2>
-            
-            <div id="qrContainer">
-                <h3>Scan QR Code to Pay</h3>
-                <img id="qrImage" src="qr-child.png" alt="QR Code" style="max-width: 200px; margin: 20px auto; display: block;">
-                <p class="timer">Time remaining: <span id="timer">05:00</span></p>
-                <p class="note">Please complete payment within 5 minutes</p>
-            </div>
-
-            <form id="donationForm">
-                <input type="hidden" id="donationType" name="donationType" value="child">
-                
-                <div class="form-group">
-                    <label for="name">Full Name *</label>
-                    <input type="text" id="name" name="name" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="email">Email Address *</label>
-                    <input type="email" id="email" name="email" required>
-                    <small>We'll send meal pictures to this email</small>
-                </div>
-
-                <div class="form-group">
-                    <label for="phone">Phone Number (Optional)</label>
-                    <input type="tel" id="phone" name="phone">
-                </div>
-
-                <div class="form-group">
-                    <label for="instagram">Instagram Username (Optional)</label>
-                    <input type="text" id="instagram" name="instagram" placeholder="@username">
-                </div>
-
-                <div class="form-group">
-                    <label for="amount">Donation Amount (₹) *</label>
-                    <input type="number" id="amount" name="amount" required min="1">
-                </div>
-
-                <div class="form-group">
-                    <label for="message">Message (Optional)</label>
-                    <textarea id="message" name="message" rows="3"></textarea>
-                </div>
-
-                <div class="form-group checkbox">
-                    <input type="checkbox" id="whatsapp" name="whatsapp">
-                    <label for="whatsapp">I'd like to receive WhatsApp confirmation</label>
-                </div>
-
-                <div class="form-group checkbox">
-                    <input type="checkbox" id="terms" name="terms" required>
-                    <label for="terms">I agree to receive updates and pictures within 6-7 days</label>
-                </div>
-
-                <button type="submit" class="submit-btn">
-                    <i class="fas fa-check-circle"></i> I Have Paid
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Owner Donation Modal -->
-    <div id="ownerModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeOwnerModal()">&times;</span>
-            <h2>Support Our Operations</h2>
-            
-            <div class="upi-info">
-                <i class="fas fa-qrcode"></i>
-                <h3>UPI Payment</h3>
-                <p class="upi-id">9797590308@fam</p>
-                <p>Scan any UPI QR code app and send money to this ID</p>
-            </div>
-
-            <form id="ownerDonationForm">
-                <div class="form-group">
-                    <label for="ownerName">Your Name *</label>
-                    <input type="text" id="ownerName" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="ownerEmail">Your Email *</label>
-                    <input type="email" id="ownerEmail" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="ownerAmount">Amount (₹) *</label>
-                    <input type="number" id="ownerAmount" required min="1">
-                </div>
-
-                <button type="submit" class="submit-btn">
-                    <i class="fas fa-heart"></i> Confirm Donation
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Contact Section -->
-    <section id="contact" class="contact">
+    <!-- About & Contact -->
+    <section id="about">
         <div class="container">
-            <h2 class="section-title">Contact & Support</h2>
-            <div class="contact-content">
-                <div class="contact-info">
-                    <div class="contact-item">
-                        <i class="fas fa-envelope"></i>
-                        <div>
-                            <h3>Email</h3>
-                            <p>radheyjii@outlook.in</p>
-                            <p>helperhands7244@gmail.com</p>
-                        </div>
-                    </div>
-                    <div class="contact-item">
-                        <i class="fas fa-phone"></i>
-                        <div>
-                            <h3>Phone & WhatsApp</h3>
-                            <p>+91 7304937349 (24/7)</p>
-                            <small>Click to chat on WhatsApp</small>
-                        </div>
-                    </div>
-                    <div class="contact-item">
-                        <i class="fas fa-clock"></i>
-                        <div>
-                            <h3>Support Hours</h3>
-                            <p>24/7 Available</p>
-                            <p>Quick response guaranteed</p>
-                        </div>
-                    </div>
-                    <div class="contact-item">
-                        <i class="fas fa-shield-alt"></i>
-                        <div>
-                            <h3>Transparency</h3>
-                            <p>Pictures sent within 6-7 days</p>
-                            <p>Manual verification of all donations</p>
+            <h2 class="section-title">About Us & Contact</h2>
+            <div class="about-contact">
+                <div class="about">
+                    <div class="info-card">
+                        <h3>About Helper Hands</h3>
+                        <p>Helper Hands is a non-profit initiative founded by Radhey with the mission to provide meals to those who need it the most - hungry children and stray dogs.</p>
+                        <p>We believe that no child or animal should go to bed hungry. With your support, we can ensure that nutritious meals reach those who need them the most.</p>
+                        <p>Every donation is tracked transparently, and donors receive photos and updates about the meals provided in their name.</p>
+                        <div class="motto">
+                            <h4><i class="fas fa-quote-left"></i> Your small contribution means a lot <i class="fas fa-quote-right"></i></h4>
+                            <p style="text-align: right; color: var(--primary); font-weight: 500;">- RADHEY, Founder</p>
                         </div>
                     </div>
                 </div>
                 
-                <div class="support-box">
-                    <h3>Need Immediate Help?</h3>
-                    <p>Contact us directly on WhatsApp for instant support</p>
-                    <a href="https://wa.me/917304937349" class="whatsapp-btn" target="_blank">
-                        <i class="fab fa-whatsapp"></i> Chat on WhatsApp
-                    </a>
+                <div class="contact">
+                    <div class="info-card">
+                        <h3>Contact & Support</h3>
+                        <p>We're here to help 24/7. Reach out to us for any questions, concerns, or support regarding your donation.</p>
+                        
+                        <div class="contact-info">
+                            <div class="contact-item">
+                                <div class="contact-icon">
+                                    <i class="fas fa-phone-alt"></i>
+                                </div>
+                                <div>
+                                    <h4>Phone / WhatsApp</h4>
+                                    <p>+91 7304937349 (24/7 Support)</p>
+                                </div>
+                            </div>
+                            
+                            <div class="contact-item">
+                                <div class="contact-icon">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div>
+                                    <h4>Email</h4>
+                                    <p>radheyjii@outlook.in</p>
+                                    <p>wasdimu@gmail.com</p>
+                                </div>
+                            </div>
+                            
+                            <div class="contact-item">
+                                <div class="contact-icon">
+                                    <i class="fas fa-info-circle"></i>
+                                </div>
+                                <div>
+                                    <h4>More Information</h4>
+                                    <p>We'll contact you on WhatsApp after your donation for confirmation and updates.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Admin Section (Visible only when logged in) -->
+    <section id="admin" style="display: none;">
+        <div class="container">
+            <div class="admin-login" id="admin-login">
+                <div class="info-card">
+                    <h2 style="text-align: center; margin-bottom: 30px;">Admin Login</h2>
+                    <form id="admin-login-form">
+                        <div class="form-group">
+                            <label for="admin-email">Email</label>
+                            <input type="email" id="admin-email" value="radheyjii@outlook.in">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="admin-password">Password</label>
+                            <input type="password" id="admin-password" value="Sunradhey#123">
+                        </div>
+                        
+                        <button type="submit" class="cta-button" style="width: 100%;">Login</button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="admin-panel" id="admin-panel" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                    <h2 style="color: var(--primary);">Donation Records</h2>
+                    <button onclick="logoutAdmin()" class="cta-button" style="padding: 10px 20px; font-size: 14px;">Logout</button>
+                </div>
+                
+                <div style="margin-bottom: 30px; display: flex; gap: 15px; flex-wrap: wrap;">
+                    <button onclick="exportToCSV()" class="cta-button" style="padding: 10px 20px; font-size: 14px;">
+                        <i class="fas fa-download"></i> Export to Excel
+                    </button>
+                    <button onclick="printRecords()" class="cta-button" style="padding: 10px 20px; font-size: 14px;">
+                        <i class="fas fa-print"></i> Print Records
+                    </button>
+                    <button onclick="clearAllData()" class="cta-button" style="padding: 10px 20px; font-size: 14px; background-color: #dc2626;">
+                        <i class="fas fa-trash"></i> Clear All Data
+                    </button>
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: var(--shadow);">
+                        <thead>
+                            <tr style="background-color: var(--primary); color: white;">
+                                <th style="padding: 15px; text-align: left;">Date</th>
+                                <th style="padding: 15px; text-align: left;">Name</th>
+                                <th style="padding: 15px; text-align: left;">Email</th>
+                                <th style="padding: 15px; text-align: left;">Phone</th>
+                                <th style="padding: 15px; text-align: left;">Type</th>
+                                <th style="padding: 15px; text-align: left;">Amount</th>
+                                <th style="padding: 15px; text-align: left;">Instagram</th>
+                                <th style="padding: 15px; text-align: left;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="donations-table-body">
+                            <!-- Data will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="no-data-message" style="text-align: center; padding: 50px; display: none;">
+                    <i class="fas fa-database" style="font-size: 60px; color: var(--light-gray); margin-bottom: 20px;"></i>
+                    <h3 style="color: var(--gray);">No donation records found</h3>
+                    <p style="color: var(--gray);">When people donate, their information will appear here.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="footer">
+    <footer id="contact">
         <div class="container">
             <div class="footer-content">
-                <div class="footer-logo">
-                    <h2>HELPER HANDS</h2>
-                    <p>"WE FOR YOU"</p>
-                    <p class="radhey-footer">#RADHEY</p>
+                <div class="footer-section footer-logo">
+                    <div class="logo">
+                        <div class="logo-icon">
+                            <i class="fas fa-hands-helping"></i>
+                        </div>
+                        <div class="logo-text">
+                            <h1>Helper Hands</h1>
+                            <p>WE FOR YOU</p>
+                        </div>
+                    </div>
+                    <p style="margin-top: 15px; color: #cbd5e1;">Helping the ones who needs the most. Your small contribution means a lot.</p>
                 </div>
                 
-                <div class="footer-links">
+                <div class="footer-section footer-links">
                     <h3>Quick Links</h3>
-                    <a href="#home">Home</a>
-                    <a href="#about">About</a>
-                    <a href="#donate">Donate</a>
-                    <a href="#contact">Contact</a>
-                    <a href="admin.html">Admin Login</a>
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#donate">Donate</a></li>
+                        <li><a href="#about">About Us</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                        <li><a href="#admin">Admin</a></li>
+                    </ul>
                 </div>
                 
-                <div class="footer-contact">
-                    <h3>Stay Connected</h3>
-                    <p><i class="fas fa-map-marker-alt"></i> Serving Nationwide</p>
+                <div class="footer-section footer-contact">
+                    <h3>Contact Us</h3>
+                    <p><i class="fas fa-phone-alt"></i> +91 7304937349</p>
                     <p><i class="fas fa-envelope"></i> radheyjii@outlook.in</p>
-                    <p><i class="fas fa-phone"></i> +91 7304937349</p>
+                    <p><i class="fas fa-clock"></i> 24/7 Support Available</p>
+                    <p style="margin-top: 15px;">Follow us for updates on our work</p>
                 </div>
             </div>
             
-            <div class="footer-bottom">
-                <p>&copy; 2024 Helper Hands. All rights reserved. | Made with <i class="fas fa-heart"></i> by Radhey</p>
-                <p class="motto">HELPING THE ONES WHO NEEDS THE MOST</p>
+            <div class="copyright">
+                <p>&copy; 2024 Helper Hands. All rights reserved. | Designed with <i class="fas fa-heart" style="color: #ef4444;"></i> to help those in need.</p>
             </div>
         </div>
     </footer>
 
-    <!-- Main JavaScript -->
-    <script src="script.js"></script>
-    
-    <!-- Firebase Functions -->
+    <!-- Donation Modal -->
+    <div class="modal" id="donation-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Donate for a Child</h3>
+                <button class="close-modal" id="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="donation-form">
+                    <div class="form-group">
+                        <label for="donor-name" class="required">Full Name</label>
+                        <input type="text" id="donor-name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="donor-email" class="required">Email Address</label>
+                        <input type="email" id="donor-email" required>
+                        <small style="color: var(--gray);">You'll receive donation confirmation and photos here</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="donor-phone">Phone Number (Optional)</label>
+                        <input type="tel" id="donor-phone">
+                        <small style="color: var(--gray);">For WhatsApp confirmation</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="donor-instagram">Instagram Username (Optional)</label>
+                        <input type="text" id="donor-instagram">
+                        <small style="color: var(--gray);">We'll mention you in our updates</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="donation-type">Donation Type</label>
+                        <select id="donation-type">
+                            <option value="child">Child Meal - ₹30</option>
+                            <option value="dog">Dog Meal - ₹20</option>
+                            <option value="both">Both Child & Dog - ₹50</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="donation-amount">Amount (₹) *</label>
+                        <input type="number" id="donation-amount" required min="1">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="donor-message">Message (Optional)</label>
+                        <textarea id="donor-message" rows="3" placeholder="Any message or instructions for us..."></textarea>
+                    </div>
+                    
+                    <div class="payment-info">
+                        <p><strong>Payment Instructions:</strong></p>
+                        <p>1. Complete the form above</p>
+                        <p>2. Use the QR code below to make payment</p>
+                        <p>3. You have <strong>5 minutes</strong> to complete the payment</p>
+                        <p>4. Click "I Have Paid" after completing payment</p>
+                        <p>5. You'll receive confirmation within 6-7 days</p>
+                    </div>
+                    
+                    <div class="qr-container">
+                        <img id="qr-image" src="qr-child.png" alt="QR Code" class="qr-image">
+                        <p id="qr-upi">UPI: 7304937349@omni</p>
+                        <p style="color: var(--gray); font-size: 14px; margin-top: 5px;">Scan this QR code with any UPI app</p>
+                    </div>
+                    
+                    <div class="timer" id="payment-timer">
+                        Time remaining: <span id="timer-display">05:00</span>
+                    </div>
+                    
+                    <button type="submit" class="cta-button" style="width: 100%;">I Have Paid</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Owner Donation Modal -->
+    <div class="modal" id="owner-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Support Our Work</h3>
+                <button class="close-modal" id="close-owner-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <div style="font-size: 60px; color: var(--accent); margin-bottom: 15px;">
+                        <i class="fas fa-hand-holding-heart"></i>
+                    </div>
+                    <h3>Donate to Support Our Operations</h3>
+                    <p>Any amount is appreciated to help us continue our mission</p>
+                </div>
+                
+                <form id="owner-donation-form">
+                    <div class="form-group">
+                        <label for="owner-name" class="required">Your Name</label>
+                        <input type="text" id="owner-name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="owner-email" class="required">Your Email</label>
+                        <input type="email" id="owner-email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="owner-phone">Phone Number (Optional)</label>
+                        <input type="tel" id="owner-phone">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="owner-amount" class="required">Amount (₹)</label>
+                        <input type="number" id="owner-amount" required min="1" value="100">
+                    </div>
+                    
+                    <div class="payment-info">
+                        <p><strong>Payment Method:</strong></p>
+                        <p>Send payment to this UPI ID:</p>
+                        <div style="text-align: center; background: #f0f9ff; padding: 15px; border-radius: 5px; margin: 15px 0;">
+                            <h3 style="color: var(--primary); margin: 0;">9797590308@fam</h3>
+                            <p style="margin: 5px 0 0; color: var(--gray);">Copy this UPI ID and send payment</p>
+                        </div>
+                        <p>After payment, come back and click "I Have Paid"</p>
+                    </div>
+                    
+                    <button type="submit" class="cta-button" style="width: 100%;">I Have Paid</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Thank You Modal -->
+    <div class="modal thankyou-modal" id="thankyou-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Thank You! 🙏</h3>
+                <button class="close-modal" id="close-thankyou-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="thankyou-content">
+                    <div class="thankyou-icon">
+                        <i class="fas fa-hands-helping"></i>
+                    </div>
+                    <h3>Your donation has been received!</h3>
+                    <p>Thank you for your generous contribution to Helper Hands.</p>
+                    <p>We have saved your donation details and will contact you on WhatsApp within 24 hours.</p>
+                    <p>You will receive photos of the meals provided within 6-7 days.</p>
+                    <div style="margin: 30px 0; padding: 20px; background: #f0f9ff; border-radius: 10px;">
+                        <p><strong>Receipt ID:</strong> <span id="receipt-id"></span></p>
+                        <p><strong>Amount:</strong> ₹<span id="donation-amount-display"></span></p>
+                        <p><strong>Type:</strong> <span id="donation-type-display"></span></p>
+                    </div>
+                    <p>For any questions, contact us at +91 7304937349</p>
+                    <button onclick="closeThankYouModal()" class="cta-button" style="margin-top: 20px;">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Global functions for buttons
-        window.openDonationForm = function(type) {
-            if (window.openDonationFormGlobal) {
-                window.openDonationFormGlobal(type);
+        // ==================== VARIABLES ====================
+        let currentDonationType = 'child';
+        let currentDonationAmount = 30;
+        let timerInterval;
+        let timeLeft = 300; // 5 minutes
+
+        // ==================== DOM ELEMENTS ====================
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileNav = document.getElementById('mobile-nav');
+        const donationModal = document.getElementById('donation-modal');
+        const ownerModal = document.getElementById('owner-modal');
+        const thankyouModal = document.getElementById('thankyou-modal');
+        const closeModalBtn = document.getElementById('close-modal');
+        const closeOwnerModalBtn = document.getElementById('close-owner-modal');
+        const closeThankyouBtn = document.getElementById('close-thankyou-modal');
+        const donationForm = document.getElementById('donation-form');
+        const ownerDonationForm = document.getElementById('owner-donation-form');
+        const adminLoginForm = document.getElementById('admin-login-form');
+
+        // ==================== INITIALIZE ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if admin is already logged in
+            if (localStorage.getItem('adminLoggedIn') === 'true') {
+                showAdminPanel();
+            }
+            
+            // Initialize sample data if empty
+            if (!localStorage.getItem('helperHandsDonations')) {
+                const sampleData = [
+                    {
+                        id: 1,
+                        date: new Date().toLocaleString(),
+                        name: 'Rahul Sharma',
+                        email: 'rahul@example.com',
+                        phone: '9876543210',
+                        type: 'child',
+                        amount: 30,
+                        instagram: '@rahul_sharma',
+                        status: 'Pending WhatsApp'
+                    },
+                    {
+                        id: 2,
+                        date: new Date(Date.now() - 86400000).toLocaleString(),
+                        name: 'Priya Patel',
+                        email: 'priya@example.com',
+                        phone: '',
+                        type: 'dog',
+                        amount: 20,
+                        instagram: '',
+                        status: 'Photos Sent'
+                    }
+                ];
+                localStorage.setItem('helperHandsDonations', JSON.stringify(sampleData));
+            }
+        });
+
+        // ==================== MOBILE MENU ====================
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileNav.classList.toggle('active');
+        });
+
+        // ==================== DONATION MODAL ====================
+        function openDonationForm(type, amount) {
+            currentDonationType = type;
+            currentDonationAmount = amount;
+            
+            // Set modal title
+            const titles = {
+                'child': 'Donate for a Child Meal',
+                'dog': 'Donate for a Dog Meal',
+                'both': 'Donate for Both Child & Dog'
+            };
+            document.getElementById('modal-title').textContent = titles[type] || 'Donate';
+            
+            // Set QR image
+            const qrImages = {
+                'child': 'qr-child.png',
+                'dog': 'qr-dog.png',
+                'both': 'qr-child.png' // You can add separate QR for both if needed
+            };
+            document.getElementById('qr-image').src = qrImages[type];
+            
+            // Set UPI text
+            document.getElementById('qr-upi').textContent = 'UPI: 7304937349@omni';
+            
+            // Set donation type and amount
+            document.getElementById('donation-type').value = type;
+            document.getElementById('donation-amount').value = amount;
+            
+            // Reset form and show modal
+            donationForm.reset();
+            donationModal.style.display = 'flex';
+            startTimer();
+        }
+
+        function openOwnerDonation() {
+            ownerModal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            donationModal.style.display = 'none';
+            clearInterval(timerInterval);
+        }
+
+        function closeOwnerModal() {
+            ownerModal.style.display = 'none';
+        }
+
+        function closeThankYouModal() {
+            thankyouModal.style.display = 'none';
+        }
+
+        // Close modals when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === donationModal) closeModal();
+            if (e.target === ownerModal) closeOwnerModal();
+            if (e.target === thankyouModal) closeThankYouModal();
+        });
+
+        // Close modals with ESC key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+                closeOwnerModal();
+                closeThankYouModal();
+            }
+        });
+
+        // ==================== TIMER ====================
+        function startTimer() {
+            timeLeft = 300;
+            updateTimerDisplay();
+            
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    alert('⏰ Payment time expired! Please restart the donation process.');
+                    closeModal();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timer-display').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // ==================== SAVE DONATION ====================
+        donationForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const donationData = {
+                id: Date.now(),
+                date: new Date().toLocaleString(),
+                name: document.getElementById('donor-name').value,
+                email: document.getElementById('donor-email').value,
+                phone: document.getElementById('donor-phone').value || '',
+                type: document.getElementById('donation-type').value,
+                amount: parseFloat(document.getElementById('donation-amount').value),
+                instagram: document.getElementById('donor-instagram').value || '',
+                message: document.getElementById('donor-message').value || '',
+                status: 'Pending WhatsApp Contact'
+            };
+            
+            // Save to localStorage
+            saveDonation(donationData);
+            
+            // Show thank you modal
+            showThankYouModal(donationData);
+            
+            // Reset and close modal
+            donationForm.reset();
+            closeModal();
+        });
+
+        ownerDonationForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const donationData = {
+                id: Date.now(),
+                date: new Date().toLocaleString(),
+                name: document.getElementById('owner-name').value,
+                email: document.getElementById('owner-email').value,
+                phone: document.getElementById('owner-phone').value || '',
+                type: 'owner',
+                amount: parseFloat(document.getElementById('owner-amount').value),
+                instagram: '',
+                message: 'Owner Support Donation',
+                status: 'Pending - UPI Payment'
+            };
+            
+            saveDonation(donationData);
+            showThankYouModal(donationData);
+            ownerDonationForm.reset();
+            closeOwnerModal();
+        });
+
+        function saveDonation(donation) {
+            // Get existing donations or initialize empty array
+            let donations = JSON.parse(localStorage.getItem('helperHandsDonations')) || [];
+            
+            // Add new donation
+            donations.push(donation);
+            
+            // Save back to localStorage
+            localStorage.setItem('helperHandsDonations', JSON.stringify(donations));
+            
+            console.log('Donation saved:', donation);
+            
+            // Update admin panel if visible
+            if (document.getElementById('admin-panel').style.display !== 'none') {
+                loadDonationsTable();
+            }
+        }
+
+        function showThankYouModal(donation) {
+            document.getElementById('receipt-id').textContent = donation.id;
+            document.getElementById('donation-amount-display').textContent = donation.amount;
+            
+            const typeText = {
+                'child': 'Child Meal',
+                'dog': 'Dog Meal',
+                'both': 'Both Child & Dog',
+                'owner': 'Owner Support'
+            };
+            document.getElementById('donation-type-display').textContent = typeText[donation.type] || donation.type;
+            
+            thankyouModal.style.display = 'flex';
+        }
+
+        // ==================== ADMIN FUNCTIONS ====================
+        adminLoginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('admin-email').value;
+            const password = document.getElementById('admin-password').value;
+            
+            if (email === 'radheyjii@outlook.in' && password === 'Sunradhey#123') {
+                localStorage.setItem('adminLoggedIn', 'true');
+                showAdminPanel();
+                alert('✅ Login successful!');
             } else {
-                alert('Please wait, page is loading...');
+                alert('❌ Invalid email or password');
             }
-        };
-        
-        window.openOwnerDonation = function() {
-            if (window.openOwnerDonationGlobal) {
-                window.openOwnerDonationGlobal();
-            } else {
-                alert('UPI ID: 9797590308@fam\n\nPlease send payment to this UPI ID.\nThen WhatsApp us: +91 7304937349');
+        });
+
+        function showAdminPanel() {
+            // Show admin section
+            document.getElementById('admin').style.display = 'block';
+            document.getElementById('admin-login').style.display = 'none';
+            document.getElementById('admin-panel').style.display = 'block';
+            
+            // Load donations table
+            loadDonationsTable();
+            
+            // Scroll to admin section
+            document.getElementById('admin').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function logoutAdmin() {
+            localStorage.removeItem('adminLoggedIn');
+            document.getElementById('admin').style.display = 'none';
+            document.getElementById('admin-login').style.display = 'block';
+            document.getElementById('admin-panel').style.display = 'none';
+            alert('Logged out successfully');
+        }
+
+        function loadDonationsTable() {
+            const donations = JSON.parse(localStorage.getItem('helperHandsDonations')) || [];
+            const tbody = document.getElementById('donations-table-body');
+            const noDataMsg = document.getElementById('no-data-message');
+            
+            if (donations.length === 0) {
+                tbody.innerHTML = '';
+                noDataMsg.style.display = 'block';
+                return;
             }
-        };
-        
-        window.closeModal = function() {
-            if (window.closeModalGlobal) {
-                window.closeModalGlobal();
+            
+            noDataMsg.style.display = 'none';
+            
+            // Sort by most recent first
+            donations.sort((a, b) => b.id - a.id);
+            
+            // Clear and populate table
+            tbody.innerHTML = '';
+            donations.forEach(donation => {
+                const row = document.createElement('tr');
+                row.style.borderBottom = '1px solid #e5e7eb';
+                
+                // Type icon
+                let typeIcon = '';
+                switch(donation.type) {
+                    case 'child': typeIcon = '👶'; break;
+                    case 'dog': typeIcon = '🐕'; break;
+                    case 'both': typeIcon = '👶🐕'; break;
+                    case 'owner': typeIcon = '💼'; break;
+                }
+                
+                row.innerHTML = `
+                    <td style="padding: 12px;">${donation.date}</td>
+                    <td style="padding: 12px;"><strong>${donation.name}</strong></td>
+                    <td style="padding: 12px;">${donation.email}</td>
+                    <td style="padding: 12px;">${donation.phone || '-'}</td>
+                    <td style="padding: 12px;">${typeIcon} ${donation.type}</td>
+                    <td style="padding: 12px; font-weight: bold; color: #10b981;">₹${donation.amount}</td>
+                    <td style="padding: 12px;">${donation.instagram || '-'}</td>
+                    <td style="padding: 12px;">
+                        <span style="display: inline-block; padding: 4px 12px; background: #fef3c7; border-radius: 20px; font-size: 12px;">
+                            ${donation.status}
+                        </span>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function exportToCSV() {
+            const donations = JSON.parse(localStorage.getItem('helperHandsDonations')) || [];
+            
+            if (donations.length === 0) {
+                alert('No data to export');
+                return;
             }
-        };
-        
-        window.closeOwnerModal = function() {
-            if (window.closeOwnerModalGlobal) {
-                window.closeOwnerModalGlobal();
+            
+            // Convert to CSV
+            const headers = ['Date', 'Name', 'Email', 'Phone', 'Type', 'Amount', 'Instagram', 'Status'];
+            const csvRows = [
+                headers.join(','),
+                ...donations.map(d => [
+                    `"${d.date}"`,
+                    `"${d.name}"`,
+                    `"${d.email}"`,
+                    `"${d.phone || ''}"`,
+                    `"${d.type}"`,
+                    d.amount,
+                    `"${d.instagram || ''}"`,
+                    `"${d.status}"`
+                ].join(','))
+            ];
+            
+            const csvString = csvRows.join('\n');
+            const blob = new Blob([csvString], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `helper-hands-donations-${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert(`Exported ${donations.length} donations to CSV`);
+        }
+
+        function printRecords() {
+            const printWindow = window.open('', '_blank');
+            const donations = JSON.parse(localStorage.getItem('helperHandsDonations')) || [];
+            
+            let html = `
+                <html>
+                <head>
+                    <title>Helper Hands Donation Records</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; }
+                        h1 { color: #1e3a8a; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+                        th { background-color: #1e3a8a; color: white; }
+                        tr:nth-child(even) { background-color: #f2f2f2; }
+                    </style>
+                </head>
+                <body>
+                    <h1>Helper Hands Donation Records</h1>
+                    <p>Generated on: ${new Date().toLocaleString()}</p>
+                    <p>Total Donations: ${donations.length}</p>
+                    <table>
+                        <tr>
+                            <th>Date</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Type</th>
+                            <th>Amount</th>
+                            <th>Instagram</th>
+                            <th>Status</th>
+                        </tr>
+            `;
+            
+            donations.forEach(d => {
+                html += `
+                    <tr>
+                        <td>${d.date}</td>
+                        <td>${d.name}</td>
+                        <td>${d.email}</td>
+                        <td>${d.phone || '-'}</td>
+                        <td>${d.type}</td>
+                        <td>₹${d.amount}</td>
+                        <td>${d.instagram || '-'}</td>
+                        <td>${d.status}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                    </table>
+                    <p style="margin-top: 30px; font-style: italic;">
+                        Helper Hands - "WE FOR YOU" | Contact: +91 7304937349
+                    </p>
+                </body>
+                </html>
+            `;
+            
+            printWindow.document.write(html);
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        function clearAllData() {
+            if (confirm('⚠️ Are you sure you want to delete ALL donation records? This cannot be undone!')) {
+                localStorage.removeItem('helperHandsDonations');
+                loadDonationsTable();
+                alert('All data has been cleared.');
             }
-        };
+        }
+
+        // ==================== SMOOTH SCROLLING ====================
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    // If admin link and not logged in, show login
+                    if (targetId === '#admin' && localStorage.getItem('adminLoggedIn') !== 'true') {
+                        document.getElementById('admin').style.display = 'block';
+                        document.getElementById('admin-login').style.display = 'block';
+                        document.getElementById('admin-panel').style.display = 'none';
+                    }
+                    
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Close mobile menu
+                    mobileNav.classList.remove('active');
+                }
+            });
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!mobileNav.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+                mobileNav.classList.remove('active');
+            }
+        });
     </script>
 </body>
 </html>
