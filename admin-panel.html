@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Helper Hands</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .login-box {
+            max-width: 400px;
+            margin: 100px auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+        }
+        
+        .admin-panel {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 30px;
+            margin-top: 20px;
+        }
+        
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        h2 {
+            color: #2c3e50;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        
+        .stat-box:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-box h3 {
+            font-size: 2rem;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .controls {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        input, select, button {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #5a67d8;
+        }
+        
+        .logout-btn {
+            background: #e74c3c;
+        }
+        
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        @media (max-width: 768px) {
+            .login-box, .admin-panel {
+                padding: 20px;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Form -->
+        <div class="login-box" id="loginForm">
+            <h2 style="text-align: center; margin-bottom: 30px;">Admin Login</h2>
+            <form id="adminLoginForm">
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500;">Email</label>
+                    <input type="email" id="adminEmail" required value="radheyjii@outlook.in" style="width: 100%;">
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 500;">Password</label>
+                    <input type="password" id="adminPassword" required value="Sunradhey#123" style="width: 100%;">
+                </div>
+                
+                <button type="submit" style="width: 100%; padding: 15px; margin-top: 10px;">
+                    Login
+                </button>
+            </form>
+        </div>
+        
+        <!-- Admin Panel -->
+        <div class="admin-panel" id="adminPanel" style="display: none;">
+            <div class="admin-header">
+                <div>
+                    <h2>Helper Hands Admin Panel</h2>
+                    <p style="color: #666;">Welcome, Admin | <span id="currentTime"></span></p>
+                </div>
+                <button class="logout-btn" id="logoutBtn">Logout</button>
+            </div>
+            
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <h3 id="totalDonations">0</h3>
+                    <p>Total Donations</p>
+                </div>
+                <div class="stat-box">
+                    <h3 id="totalAmount">₹0</h3>
+                    <p>Total Amount</p>
+                </div>
+                <div class="stat-box">
+                    <h3 id="childDonations">0</h3>
+                    <p>Child Meals</p>
+                </div>
+                <div class="stat-box">
+                    <h3 id="dogDonations">0</h3>
+                    <p>Dog Meals</p>
+                </div>
+            </div>
+            
+            <!-- Controls -->
+            <div class="controls">
+                <button id="exportBtn">Export CSV</button>
+                <input type="text" id="searchInput" placeholder="Search..." style="flex: 1;">
+                <select id="filterType">
+                    <option value="all">All Types</option>
+                    <option value="child">Child Only</option>
+                    <option value="dog">Dog Only</option>
+                    <option value="both">Both</option>
+                    <option value="owner">Owner Support</option>
+                </select>
+            </div>
+            
+            <!-- Table -->
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Type</th>
+                            <th>Amount</th>
+                            <th>Instagram</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="donationsTable">
+                        <!-- Data will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check login
+        document.addEventListener('DOMContentLoaded', function() {
+            if (localStorage.getItem('adminLoggedIn') === 'true') {
+                showAdminPanel();
+            }
+            
+            document.getElementById('adminLoginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const email = document.getElementById('adminEmail').value;
+                const password = document.getElementById('adminPassword').value;
+                
+                if (email === 'radheyjii@outlook.in' && password === 'Sunradhey#123') {
+                    localStorage.setItem('adminLoggedIn', 'true');
+                    showAdminPanel();
+                } else {
+                    alert('Invalid credentials');
+                }
+            });
+            
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                localStorage.removeItem('adminLoggedIn');
+                location.reload();
+            });
+            
+            document.getElementById('exportBtn').addEventListener('click', exportToCSV);
+        });
+        
+        function showAdminPanel() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+            loadDonations();
+        }
+        
+        function loadDonations() {
+            const donations = JSON.parse(localStorage.getItem('helperHandsDonations')) || [];
+            const table = document.getElementById('donationsTable');
+            
+            // Update stats
+            document.getElementById('totalDonations').textContent = donations.length;
+            document.getElementById('totalAmount').textContent = '₹' + donations.reduce((sum, d) => sum + d.amount, 0);
+            document.getElementById('childDonations').textContent = donations.filter(d => d.type === 'child').length;
+            document.getElementById('dogDonations').textContent = donations.filter(d => d.type === 'dog').length;
+            
+            // Update table
+            table.innerHTML = '';
+            donations.forEach(d => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${d.date}</td>
+                    <td>${d.name}</td>
+                    <td>${d.email}</td>
+                    <td>${d.phone || '-'}</td>
+                    <td>${d.type}</td>
+                    <td>₹${d.amount}</td>
+                    <td>${d.instagram || '-'}</td>
+                    <td>${d.status}</td>
+                `;
+                table.appendChild(row);
+            });
+        }
+        
+        function exportToCSV() {
+            const donations = JSON.parse(localStorage.getItem('helperHandsDonations')) || [];
+            if (donations.length === 0) {
+                alert('No data to export');
+                return;
+            }
+            
+            const headers = ['Date', 'Name', 'Email', 'Phone', 'Type', 'Amount', 'Instagram', 'Status'];
+            const csvRows = [
+                headers.join(','),
+                ...donations.map(d => [
+                    `"${d.date}"`,
+                    `"${d.name}"`,
+                    `"${d.email}"`,
+                    `"${d.phone || ''}"`,
+                    `"${d.type}"`,
+                    d.amount,
+                    `"${d.instagram || ''}"`,
+                    `"${d.status}"`
+                ].join(','))
+            ];
+            
+            const csvString = csvRows.join('\n');
+            const blob = new Blob([csvString], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `helper-hands-donations.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
