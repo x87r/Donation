@@ -1,163 +1,212 @@
-// Admin credentials
+// === FIREBASE CONFIGURATION ===
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, getDocs, query, orderBy, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyCP-uKQ7rZqNvT1CnW5QiWnkzclHGix_5Q",
+  authDomain: "vasudevdonations.firebaseapp.com",
+  projectId: "vasudevdonations",
+  storageBucket: "vasudevdonations.firebasestorage.app",
+  messagingSenderId: "219370651633",
+  appId: "1:219370651633:web:98146244613a1e50f90e50"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// === Admin Credentials ===
 const ADMIN_CREDENTIALS = {
     email: 'radheyjii@outlook.in',
     password: 'Sunradhey#123'
 };
 
-// Mock data for demonstration
-// In production, you would fetch this from your database
-let mockDonations = [
-    {
-        id: '1',
-        name: 'John Doe',
-        email: 'john@example.com',
-        phone: '+919876543210',
-        type: 'child',
-        amount: 300,
-        instagram: '@johndoe',
-        whatsapp: true,
-        message: 'Keep up the good work!',
-        timestamp: '2024-01-15T10:30:00Z',
-        status: 'verified'
-    },
-    {
-        id: '2',
-        name: 'Jane Smith',
-        email: 'jane@example.com',
-        phone: null,
-        type: 'dog',
-        amount: 200,
-        instagram: null,
-        whatsapp: false,
-        message: null,
-        timestamp: '2024-01-14T15:45:00Z',
-        status: 'pending'
-    },
-    {
-        id: '3',
-        name: 'Bob Wilson',
-        email: 'bob@example.com',
-        phone: '+919876543211',
-        type: 'both',
-        amount: 500,
-        instagram: '@bobwilson',
-        whatsapp: true,
-        message: 'For children and dogs',
-        timestamp: '2024-01-13T09:15:00Z',
-        status: 'verified'
-    },
-    {
-        id: '4',
-        name: 'Alice Johnson',
-        email: 'alice@example.com',
-        phone: '+919876543212',
-        type: 'owner',
-        amount: 100,
-        instagram: '@alicej',
-        whatsapp: true,
-        message: 'Support your work',
-        timestamp: '2024-01-12T14:20:00Z',
-        status: 'verified'
-    }
-];
-
-// DOM Elements
+// === DOM Elements ===
 const loginForm = document.getElementById('loginForm');
 const adminPanel = document.getElementById('adminPanel');
 const adminLoginForm = document.getElementById('adminLoginForm');
 const donationsTable = document.getElementById('donationsTable');
 
-// Login Handler
-adminLoginForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    
-    const email = document.getElementById('adminEmail').value;
-    const password = document.getElementById('adminPassword').value;
-    
-    if (email === ADMIN_CREDENTIALS.email && password === ADMIN_CREDENTIALS.password) {
-        // Successful login
-        loginForm.style.display = 'none';
-        adminPanel.style.display = 'block';
-        loadDonations();
-    } else {
-        alert('Invalid credentials. Please try again.');
-    }
-});
-
-// Load and display donations
-function loadDonations() {
-    // In production, fetch from your API
-    // const response = await fetch(`${API_ENDPOINT}/donations`);
-    // const donations = await response.json();
-    
-    const donations = mockDonations; // Using mock data for demo
-    
-    // Update stats
-    updateStats(donations);
-    
-    // Populate table
-    populateTable(donations);
+// === Login Handler ===
+if (adminLoginForm) {
+    adminLoginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const email = document.getElementById('adminEmail').value;
+        const password = document.getElementById('adminPassword').value;
+        
+        if (email === ADMIN_CREDENTIALS.email && password === ADMIN_CREDENTIALS.password) {
+            // Successful login
+            loginForm.style.display = 'none';
+            adminPanel.style.display = 'block';
+            loadDonations();
+        } else {
+            alert('❌ Invalid credentials. Please try again.');
+        }
+    });
 }
 
+// === Load Donations from Firebase ===
+async function loadDonations() {
+    try {
+        showLoadingAdmin();
+        
+        const donationsQuery = query(
+            collection(db, "donations"),
+            orderBy("createdAt", "desc")
+        );
+        
+        const querySnapshot = await getDocs(donationsQuery);
+        
+        const donations = [];
+        querySnapshot.forEach((doc) => {
+            donations.push({
+                id: doc.id,
+                ...doc.data()
+            });
+        });
+        
+        // Update stats
+        updateStats(donations);
+        
+        // Populate table
+        populateTable(donations);
+        
+        hideLoadingAdmin();
+        
+    } catch (error) {
+        console.error('Error loading donations:', error);
+        hideLoadingAdmin();
+        
+        // Fallback to localStorage
+        useLocalData();
+    }
+}
+
+// === Update Statistics ===
 function updateStats(donations) {
     const totalDonations = donations.length;
-    const totalAmount = donations.reduce((sum, d) => sum + d.amount, 0);
+    const totalAmount = donations.reduce((sum, d) => sum + (parseFloat(d.amount) || 0), 0);
+    
     const childDonations = donations.filter(d => d.type === 'child').length;
     const dogDonations = donations.filter(d => d.type === 'dog').length;
+    const bothDonations = donations.filter(d => d.type === 'both').length;
     const ownerDonations = donations.filter(d => d.type === 'owner').length;
     
-    document.getElementById('totalDonations').textContent = totalDonations;
-    document.getElementById('totalAmount').textContent = `₹${totalAmount}`;
-    document.getElementById('childDonations').textContent = childDonations;
-    document.getElementById('dogDonations').textContent = dogDonations;
-    document.getElementById('ownerDonations').textContent = ownerDonations;
+    const verifiedDonations = donations.filter(d => d.status === 'verified').length;
+    const pendingDonations = donations.filter(d => d.status === 'pending' || d.status === 'pending_local').length;
+    
+    // Update DOM elements
+    if (document.getElementById('totalDonations')) {
+        document.getElementById('totalDonations').textContent = totalDonations;
+    }
+    if (document.getElementById('totalAmount')) {
+        document.getElementById('totalAmount').textContent = `₹${totalAmount}`;
+    }
+    if (document.getElementById('childDonations')) {
+        document.getElementById('childDonations').textContent = childDonations;
+    }
+    if (document.getElementById('dogDonations')) {
+        document.getElementById('dogDonations').textContent = dogDonations;
+    }
+    if (document.getElementById('ownerDonations')) {
+        document.getElementById('ownerDonations').textContent = ownerDonations;
+    }
+    if (document.getElementById('verifiedDonations')) {
+        document.getElementById('verifiedDonations').textContent = verifiedDonations;
+    }
+    if (document.getElementById('pendingDonations')) {
+        document.getElementById('pendingDonations').textContent = pendingDonations;
+    }
 }
 
+// === Populate Donations Table ===
 function populateTable(donations) {
+    if (!donationsTable) return;
+    
     donationsTable.innerHTML = '';
     
     donations.forEach(donation => {
         const row = document.createElement('tr');
         
         // Format date
-        const date = new Date(donation.timestamp);
-        const formattedDate = date.toLocaleDateString('en-IN', {
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric'
-        });
+        let formattedDate = 'N/A';
+        if (donation.createdAt) {
+            if (donation.createdAt.toDate) {
+                const date = donation.createdAt.toDate();
+                formattedDate = date.toLocaleDateString('en-IN', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                });
+            } else if (typeof donation.createdAt === 'string') {
+                formattedDate = new Date(donation.createdAt).toLocaleDateString('en-IN');
+            }
+        }
         
         // Status badge
-        const statusBadge = donation.status === 'verified' 
-            ? `<span style="color: #27ae60;"><i class="fas fa-check-circle"></i> Verified</span>`
-            : `<span style="color: #f39c12;"><i class="fas fa-clock"></i> Pending</span>`;
+        let statusBadge = '';
+        if (donation.status === 'verified') {
+            statusBadge = `<span style="color: #27ae60; font-weight: bold;">
+                <i class="fas fa-check-circle"></i> Verified
+            </span>`;
+        } else if (donation.status === 'pending_local') {
+            statusBadge = `<span style="color: #f39c12; font-weight: bold;">
+                <i class="fas fa-exclamation-triangle"></i> Local Save
+            </span>`;
+        } else {
+            statusBadge = `<span style="color: #f39c12; font-weight: bold;">
+                <i class="fas fa-clock"></i> Pending
+            </span>`;
+        }
         
         // WhatsApp badge
         const whatsappBadge = donation.whatsapp
             ? `<i class="fab fa-whatsapp" style="color: #25D366;"></i> Yes`
             : `<i class="fas fa-times" style="color: #e74c3c;"></i> No`;
         
+        // Type icon
+        let typeIcon = '';
+        switch(donation.type) {
+            case 'child':
+                typeIcon = '<i class="fas fa-child"></i> Child';
+                break;
+            case 'dog':
+                typeIcon = '<i class="fas fa-paw"></i> Dog';
+                break;
+            case 'both':
+                typeIcon = '<i class="fas fa-hands-helping"></i> Both';
+                break;
+            case 'owner':
+                typeIcon = '<i class="fas fa-user-tie"></i> Owner';
+                break;
+            default:
+                typeIcon = donation.type || 'N/A';
+        }
+        
         row.innerHTML = `
             <td>${formattedDate}</td>
-            <td>${donation.name}</td>
-            <td>${donation.email}</td>
+            <td>${donation.name || ''}</td>
+            <td>${donation.email || ''}</td>
             <td>${donation.phone || 'N/A'}</td>
-            <td>
-                ${donation.type === 'child' ? '<i class="fas fa-child"></i> Child' : ''}
-                ${donation.type === 'dog' ? '<i class="fas fa-paw"></i> Dog' : ''}
-                ${donation.type === 'both' ? '<i class="fas fa-hands-helping"></i> Both' : ''}
-                ${donation.type === 'owner' ? '<i class="fas fa-user-tie"></i> Owner' : ''}
-            </td>
-            <td><strong>₹${donation.amount}</strong></td>
+            <td>${typeIcon}</td>
+            <td><strong>₹${donation.amount || 0}</strong></td>
             <td>${donation.instagram || 'N/A'}</td>
             <td>${whatsappBadge}</td>
             <td>${statusBadge}</td>
             <td>
-                <button onclick="viewDetails('${donation.id}')" class="donate-btn" style="padding: 5px 10px; font-size: 0.9rem;">
+                <button onclick="viewDetails('${donation.id}')" 
+                        style="background: #3498db; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; margin: 2px;">
                     <i class="fas fa-eye"></i>
                 </button>
-                <button onclick="contactDonor('${donation.email}', '${donation.phone}')" class="donate-btn" style="padding: 5px 10px; font-size: 0.9rem; background: #3498db;">
+                <button onclick="contactDonor('${donation.email}', '${donation.phone}', '${donation.name}')" 
+                        style="background: #2ecc71; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; margin: 2px;">
                     <i class="fas fa-comment"></i>
+                </button>
+                <button onclick="verifyPayment('${donation.id}')" 
+                        style="background: #27ae60; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; margin: 2px;">
+                    <i class="fas fa-check"></i>
                 </button>
             </td>
         `;
@@ -166,123 +215,340 @@ function populateTable(donations) {
     });
 }
 
-// Filter donations
-function filterDonations() {
-    const typeFilter = document.getElementById('filterType').value;
-    const dateFilter = document.getElementById('filterDate').value;
-    const searchFilter = document.getElementById('searchInput').value.toLowerCase();
-    
-    let filtered = [...mockDonations];
-    
-    // Filter by type
-    if (typeFilter !== 'all') {
-        filtered = filtered.filter(d => d.type === typeFilter);
-    }
-    
-    // Filter by date
-    if (dateFilter) {
-        filtered = filtered.filter(d => {
-            const donationDate = new Date(d.timestamp).toISOString().split('T')[0];
-            return donationDate === dateFilter;
+// === View Donor Details ===
+window.viewDetails = async function(id) {
+    try {
+        const donationsQuery = query(collection(db, "donations"));
+        const querySnapshot = await getDocs(donationsQuery);
+        
+        let donation = null;
+        querySnapshot.forEach((doc) => {
+            if (doc.id === id) {
+                donation = { id: doc.id, ...doc.data() };
+            }
         });
+        
+        if (donation) {
+            let formattedDate = 'N/A';
+            if (donation.createdAt) {
+                if (donation.createdAt.toDate) {
+                    formattedDate = donation.createdAt.toDate().toLocaleString('en-IN');
+                } else if (typeof donation.createdAt === 'string') {
+                    formattedDate = new Date(donation.createdAt).toLocaleString('en-IN');
+                }
+            }
+            
+            const details = `
+📋 DONATION DETAILS:
+────────────────
+👤 Name: ${donation.name || 'N/A'}
+📧 Email: ${donation.email || 'N/A'}
+📞 Phone: ${donation.phone || 'N/A'}
+💰 Amount: ₹${donation.amount || 0}
+🎯 Type: ${donation.type || 'N/A'}
+📷 Instagram: ${donation.instagram || 'N/A'}
+📱 WhatsApp: ${donation.whatsapp ? 'Yes' : 'No'}
+📝 Message: ${donation.message || 'N/A'}
+📊 Status: ${donation.status || 'pending'}
+📅 Date: ${formattedDate}
+✅ Verified: ${donation.paymentVerified ? 'Yes' : 'No'}
+🆔 ID: ${donation.id}
+────────────────
+`;
+            alert(details);
+        } else {
+            // Check localStorage
+            const localDonations = JSON.parse(localStorage.getItem('helperHandsDonations') || '[]');
+            const localDonation = localDonations.find(d => d.id === id);
+            
+            if (localDonation) {
+                const details = `
+📋 LOCAL DONATION DETAILS:
+────────────────
+👤 Name: ${localDonation.name || 'N/A'}
+📧 Email: ${localDonation.email || 'N/A'}
+📞 Phone: ${localDonation.phone || 'N/A'}
+💰 Amount: ₹${localDonation.amount || 0}
+🎯 Type: ${localDonation.type || 'N/A'}
+📷 Instagram: ${localDonation.instagram || 'N/A'}
+📱 WhatsApp: ${localDonation.whatsapp ? 'Yes' : 'No'}
+📝 Message: ${localDonation.message || 'N/A'}
+📊 Status: ${localDonation.status || 'pending_local'}
+📅 Date: ${localDonation.timestamp || 'N/A'}
+⚠️ Note: Saved locally (no internet)
+────────────────
+`;
+                alert(details);
+            } else {
+                alert('Donation not found!');
+            }
+        }
+    } catch (error) {
+        console.error('Error viewing details:', error);
+        alert('Error loading details');
     }
-    
-    // Filter by search
-    if (searchFilter) {
-        filtered = filtered.filter(d => 
-            d.name.toLowerCase().includes(searchFilter) ||
-            d.email.toLowerCase().includes(searchFilter) ||
-            (d.instagram && d.instagram.toLowerCase().includes(searchFilter))
-        );
-    }
-    
-    populateTable(filtered);
-    updateStats(filtered);
-}
+};
 
-// View donor details
-function viewDetails(id) {
-    const donation = mockDonations.find(d => d.id === id);
-    if (donation) {
-        const details = `
-Name: ${donation.name}
-Email: ${donation.email}
-Phone: ${donation.phone || 'Not provided'}
-Type: ${donation.type}
-Amount: ₹${donation.amount}
-Instagram: ${donation.instagram || 'Not provided'}
-WhatsApp: ${donation.whatsapp ? 'Yes' : 'No'}
-Date: ${new Date(donation.timestamp).toLocaleString()}
-Message: ${donation.message || 'No message'}
-Status: ${donation.status}
-        `;
-        alert(details);
-    }
-}
-
-// Contact donor
-function contactDonor(email, phone) {
-    const message = encodeURIComponent(`Hello, this is Helper Hands. Thank you for your donation! We'll send you updates within 6-7 days. For any queries, contact +917304937349.`);
-    
+// === Contact Donor ===
+window.contactDonor = function(email, phone, name) {
     if (phone) {
-        // Open WhatsApp
+        const message = encodeURIComponent(`Namaste ${name || 'Donor'}! 🙏\n\nThank you for your donation to Helper Hands.\nWe'll send you pictures within 6-7 days.\n\nJai Shree Krishna! 🙏\n#RADHEY - Helper Hands Team`);
         window.open(`https://wa.me/${phone.replace('+', '')}?text=${message}`, '_blank');
     } else if (email) {
-        // Open email client
-        window.open(`mailto:${email}?subject=Thank you for your donation!&body=Dear donor,%0D%0A%0D%0AThank you for your generous contribution to Helper Hands. We'll send you pictures and updates within 6-7 days.%0D%0A%0D%0ABest regards,%0D%0AHelper Hands Team%0D%0A+91 7304937349`, '_blank');
+        const subject = encodeURIComponent('Thank you for your donation!');
+        const body = encodeURIComponent(`Dear ${name || 'Donor'},\n\nThank you for your generous contribution to Helper Hands.\nWe'll send you pictures and updates within 6-7 days.\n\nBest regards,\nHelper Hands Team\n+91 7304937349`);
+        window.open(`mailto:${email}?subject=${subject}&body=${body}`, '_blank');
     } else {
         alert('No contact information available for this donor.');
     }
+};
+
+// === Verify Payment ===
+window.verifyPayment = async function(donationId) {
+    const verificationCode = prompt('Enter verification code:');
+    if (!verificationCode) return;
+    
+    try {
+        const donationRef = doc(db, "donations", donationId);
+        await updateDoc(donationRef, {
+            status: 'verified',
+            paymentVerified: true,
+            verificationCode: verificationCode,
+            updatedAt: new Date().toISOString()
+        });
+        
+        alert('✅ Payment verified successfully!');
+        
+        // Refresh donations
+        loadDonations();
+        
+        // Get donor details for WhatsApp
+        const donationsQuery = query(collection(db, "donations"));
+        const querySnapshot = await getDocs(donationsQuery);
+        
+        let donation = null;
+        querySnapshot.forEach((doc) => {
+            if (doc.id === donationId) {
+                donation = { id: doc.id, ...doc.data() };
+            }
+        });
+        
+        if (donation && donation.phone) {
+            const whatsappMsg = encodeURIComponent(
+                `Namaste ${donation.name}! 🙏\n\n` +
+                `Thank you for donating ₹${donation.amount} to Helper Hands.\n` +
+                `✅ Payment VERIFIED!\n` +
+                `📋 Verification Code: ${verificationCode}\n` +
+                `📸 Pictures will be sent within 6-7 days.\n` +
+                `📞 Contact: +91 7304937349\n\n` +
+                `Jai Shree Krishna! 🙏\n` +
+                `#RADHEY - Helper Hands Team\n` +
+                `"WE FOR YOU" 💙`
+            );
+            
+            window.open(`https://wa.me/${donation.phone.replace('+', '')}?text=${whatsappMsg}`, '_blank');
+        }
+        
+    } catch (error) {
+        console.error('Error verifying payment:', error);
+        alert('Error verifying payment: ' + error.message);
+    }
+};
+
+// === Export Data to CSV ===
+window.exportData = async function() {
+    try {
+        const donationsQuery = query(collection(db, "donations"));
+        const querySnapshot = await getDocs(donationsQuery);
+        
+        const donations = [];
+        querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            donations.push({
+                ID: doc.id,
+                Name: data.name || '',
+                Email: data.email || '',
+                Phone: data.phone || '',
+                Amount: data.amount || 0,
+                Type: data.type || '',
+                Status: data.status || 'pending',
+                Instagram: data.instagram || '',
+                WhatsApp: data.whatsapp ? 'Yes' : 'No',
+                Message: (data.message || '').replace(/"/g, '""'),
+                'Created At': data.createdAt ? 
+                    (data.createdAt.toDate ? 
+                        data.createdAt.toDate().toISOString() : 
+                        data.createdAt) : ''
+            });
+        });
+        
+        // Also get local donations
+        const localDonations = JSON.parse(localStorage.getItem('helperHandsDonations') || '[]');
+        localDonations.forEach(donation => {
+            donations.push({
+                ID: donation.id,
+                Name: donation.name || '',
+                Email: donation.email || '',
+                Phone: donation.phone || '',
+                Amount: donation.amount || 0,
+                Type: donation.type || '',
+                Status: donation.status || 'pending_local',
+                Instagram: donation.instagram || '',
+                WhatsApp: donation.whatsapp ? 'Yes' : 'No',
+                Message: (donation.message || '').replace(/"/g, '""'),
+                'Created At': donation.timestamp || ''
+            });
+        });
+        
+        // Convert to CSV
+        const csvData = convertToCSV(donations);
+        downloadCSV(csvData, `helper-hands-donations-${new Date().toISOString().split('T')[0]}.csv`);
+        
+    } catch (error) {
+        console.error('Export error:', error);
+        alert('Error exporting data. Using local data...');
+        exportLocalData();
+    }
+};
+
+function convertToCSV(data) {
+    if (data.length === 0) return '';
+    
+    const headers = Object.keys(data[0]);
+    const rows = data.map(row => 
+        headers.map(header => {
+            const cell = row[header] !== null ? row[header] : '';
+            return `"${cell.toString().replace(/"/g, '""')}"`;
+        }).join(',')
+    );
+    
+    return [headers.join(','), ...rows].join('\n');
 }
 
-// Export data to CSV
-function exportData() {
-    const headers = ['Date', 'Name', 'Email', 'Phone', 'Type', 'Amount', 'Instagram', 'WhatsApp', 'Status', 'Message'];
-    const csvData = mockDonations.map(d => [
-        new Date(d.timestamp).toLocaleDateString(),
-        d.name,
-        d.email,
-        d.phone || '',
-        d.type,
-        d.amount,
-        d.instagram || '',
-        d.whatsapp ? 'Yes' : 'No',
-        d.status,
-        d.message || ''
-    ]);
-    
-    let csvContent = headers.join(',') + '\n';
-    csvData.forEach(row => {
-        csvContent += row.map(cell => `"${cell}"`).join(',') + '\n';
-    });
-    
-    const blob = new Blob([csvContent], { type: 'text/csv' });
+function downloadCSV(csvData, filename) {
+    const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `helper-hands-donations-${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = filename;
+    document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
 }
 
-// Logout
-function logout() {
-    if (confirm('Are you sure you want to logout?')) {
-        adminPanel.style.display = 'none';
-        loginForm.style.display = 'block';
-        adminLoginForm.reset();
+// === Export Local Data ===
+function exportLocalData() {
+    const donations = JSON.parse(localStorage.getItem('helperHandsDonations') || '[]');
+    
+    if (donations.length === 0) {
+        alert('No local data to export!');
+        return;
+    }
+    
+    const csvData = convertToCSV(donations.map(d => ({
+        ID: d.id,
+        Name: d.name || '',
+        Email: d.email || '',
+        Phone: d.phone || '',
+        Amount: d.amount || 0,
+        Type: d.type || '',
+        Status: d.status || 'pending_local',
+        Instagram: d.instagram || '',
+        WhatsApp: d.whatsapp ? 'Yes' : 'No',
+        Message: (d.message || '').replace(/"/g, '""'),
+        'Created At': d.timestamp || ''
+    })));
+    
+    downloadCSV(csvData, `helper-hands-local-donations-${new Date().toISOString().split('T')[0]}.csv`);
+}
+
+// === Local Data Fallback ===
+function useLocalData() {
+    const donations = JSON.parse(localStorage.getItem('helperHandsDonations') || '[]');
+    
+    const stats = {
+        total: donations.length,
+        totalAmount: donations.reduce((sum, d) => sum + (parseFloat(d.amount) || 0), 0),
+        child: donations.filter(d => d.type === 'child').length,
+        dog: donations.filter(d => d.type === 'dog').length,
+        both: donations.filter(d => d.type === 'both').length,
+        owner: donations.filter(d => d.type === 'owner').length,
+        verified: donations.filter(d => d.status === 'verified').length,
+        pending: donations.filter(d => d.status === 'pending' || d.status === 'pending_local').length
+    };
+    
+    updateStatsForLocal(stats);
+    populateTableForLocal(donations);
+}
+
+function updateStatsForLocal(stats) {
+    if (document.getElementById('totalDonations')) {
+        document.getElementById('totalDonations').textContent = stats.total;
+    }
+    if (document.getElementById('totalAmount')) {
+        document.getElementById('totalAmount').textContent = `₹${stats.totalAmount}`;
+    }
+    if (document.getElementById('childDonations')) {
+        document.getElementById('childDonations').textContent = stats.child;
+    }
+    if (document.getElementById('dogDonations')) {
+        document.getElementById('dogDonations').textContent = stats.dog;
+    }
+    if (document.getElementById('ownerDonations')) {
+        document.getElementById('ownerDonations').textContent = stats.owner;
+    }
+    if (document.getElementById('verifiedDonations')) {
+        document.getElementById('verifiedDonations').textContent = stats.verified;
+    }
+    if (document.getElementById('pendingDonations')) {
+        document.getElementById('pendingDonations').textContent = stats.pending;
     }
 }
 
-// Auto-refresh data every 30 seconds
-setInterval(() => {
-    if (adminPanel.style.display === 'block') {
-        loadDonations();
-    }
-}, 30000);
+function populateTableForLocal(donations) {
+    if (!donationsTable) return;
+    
+    donationsTable.innerHTML = '';
+    
+    donations.forEach(donation => {
+        const row = document.createElement('tr');
+        
+        const formattedDate = donation.timestamp ? 
+            new Date(donation.timestamp).toLocaleDateString('en-IN') : 'N/A';
+        
+        const statusBadge = donation.status === 'verified' 
+            ? `<span style="color: #27ae60;"><i class="fas fa-check-circle"></i> Verified</span>`
+            : `<span style="color: #f39c12;"><i class="fas fa-exclamation-triangle"></i> Local</span>`;
+        
+        const whatsappBadge = donation.whatsapp
+            ? `<i class="fab fa-whatsapp" style="color: #25D366;"></i> Yes`
+            : `<i class="fas fa-times" style="color: #e74c3c;"></i> No`;
+        
+        row.innerHTML = `
+            <td>${formattedDate}</td>
+            <td>${donation.name || ''}</td>
+            <td>${donation.email || ''}</td>
+            <td>${donation.phone || 'N/A'}</td>
+            <td>${donation.type || ''}</td>
+            <td><strong>₹${donation.amount || 0}</strong></td>
+            <td>${donation.instagram || 'N/A'}</td>
+            <td>${whatsappBadge}</td>
+            <td>${statusBadge}</td>
+            <td>
+                <button onclick="viewLocalDetails('${donation.id}')" 
+                        style="background: #3498db; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </td>
+        `;
+        
+        donationsTable.appendChild(row);
+    });
+}
 
-// Initialize
-document.addEventListener('DOMContentLoaded', () => {
-    // Set default date to today
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('filterDate').value = today;
-});
+window.viewLocalDetails = function(id) {
+    const donations = JSON.parse(localStorage.getItem('helperHandsDonations') || '[]');
+    const donation = donations.find(d => d.id === id);
+    
+    if (donation)
