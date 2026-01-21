@@ -1,0 +1,18 @@
+{
+  "name": "helper-hands-donation",
+  "version": "1.0.0",
+  "description": "Donation website for Helper Hands",
+  "scripts": {
+    "build": "echo 'No build required'",
+    "dev": "netlify dev",
+    "start": "netlify dev"
+  },
+  "dependencies": {
+    "mongodb": "^5.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3"
+  },
+  "devDependencies": {
+    "@netlify/functions": "^2.0.0"
+  }
+}
