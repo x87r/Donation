@@ -551,4 +551,75 @@ window.viewLocalDetails = function(id) {
     const donations = JSON.parse(localStorage.getItem('helperHandsDonations') || '[]');
     const donation = donations.find(d => d.id === id);
     
-    if (donation)
+    if (donation) {
+        const details = `
+📋 LOCAL DONATION DETAILS:
+────────────────
+👤 Name: ${donation.name || 'N/A'}
+📧 Email: ${donation.email || 'N/A'}
+📞 Phone: ${donation.phone || 'N/A'}
+💰 Amount: ₹${donation.amount || 0}
+🎯 Type: ${donation.type || 'N/A'}
+📷 Instagram: ${donation.instagram || 'N/A'}
+📱 WhatsApp: ${donation.whatsapp ? 'Yes' : 'No'}
+📝 Message: ${donation.message || 'N/A'}
+📊 Status: ${donation.status || 'pending_local'}
+📅 Date: ${donation.timestamp || 'N/A'}
+⚠️ Note: Saved locally
+────────────────
+`;
+        alert(details);
+    } else {
+        alert('Donation not found!');
+    }
+};
+
+// === Loading Functions ===
+function showLoadingAdmin() {
+    const loader = document.createElement('div');
+    loader.id = 'adminLoader';
+    loader.innerHTML = `
+        <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                    background: rgba(0,0,0,0.5); display: flex; justify-content: center; 
+                    align-items: center; z-index: 9999;">
+            <div style="background: white; padding: 30px; border-radius: 10px; text-align: center;">
+                <div class="spinner" style="width: 40px; height: 40px; border: 4px solid #f3f3f3;
+                         border-top: 4px solid #3498db; border-radius: 50%; 
+                         animation: spin 1s linear infinite; margin: 0 auto 15px;"></div>
+                <p style="font-size: 16px; color: #333;">Loading donations...</p>
+            </div>
+        </div>
+        <style>
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        </style>
+    `;
+    document.body.appendChild(loader);
+}
+
+function hideLoadingAdmin() {
+    const loader = document.getElementById('adminLoader');
+    if (loader) {
+        loader.remove();
+    }
+}
+
+// === Logout Function ===
+window.logout = function() {
+    if (confirm('Are you sure you want to logout?')) {
+        adminPanel.style.display = 'none';
+        loginForm.style.display = 'block';
+        if (adminLoginForm) {
+            adminLoginForm.reset();
+        }
+    }
+};
+
+// === Auto-refresh every 30 seconds ===
+setInterval(() => {
+    if (adminPanel && adminPanel.style.display === 'block') {
+        loadDonations();
+    }
+}, 30000);
